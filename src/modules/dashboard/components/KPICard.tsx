@@ -1,5 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { TooltipInfoIcon } from "@/modules/core/router";
+import { FormatDollar } from "@/modules/dashboard/router";
 
 export default function KPICard({
   title = "Card Title",
@@ -15,8 +16,7 @@ export default function KPICard({
       </CardHeader>
       <CardContent>
         <div className="text-4xl font-bold">
-          {isCurrency && "$"}
-          {data}
+          {isCurrency? FormatDollar(data): data}
         </div>
         <p className="text-xs text-muted-foreground">{legend}</p>
       </CardContent>

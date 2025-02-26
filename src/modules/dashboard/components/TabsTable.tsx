@@ -1,7 +1,11 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TableLog } from "@/modules/dashboard/router";
 
-export default function TabsTable() {
+export default function TabsTable(
+  {
+    currentFilters = {}
+  }
+) {
   return (
     <Tabs defaultValue="open-tab">
       <TabsList className="grid w-[400px] grid-cols-2">
@@ -9,10 +13,10 @@ export default function TabsTable() {
         <TabsTrigger value="resolved-tab">Resolved</TabsTrigger>
       </TabsList>
       <TabsContent value="open-tab">
-        <TableLog />
+        <TableLog filters={currentFilters} />
       </TabsContent>
       <TabsContent value="resolved-tab">
-        <TableLog />
+        <TableLog filters={currentFilters}/>
       </TabsContent>
     </Tabs>
   );
