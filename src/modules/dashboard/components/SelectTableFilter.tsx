@@ -14,7 +14,7 @@ export default function SelectTableFilter({
 }) {
   return (
     <Select>
-      <SelectTrigger className="w-[250px]">
+      <SelectTrigger className="w-[250px] border-amber-300 ">
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>

@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge"
 import "./../../../../Celonis_DummyData.json";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -18,13 +19,12 @@ import {
   TableLogFilters,
 } from "@/modules/dashboard/router";
 
-import {CircleLoader} from "react-spinners"
-
 import {
   getInvoices,
   Invoice,
   InvoiceFilters,
 } from "@/modules/dashboard/services/apiService";
+import { CircleLoader } from "react-spinners";
 
 const data_details = [
   [
@@ -113,9 +113,6 @@ const TableLog: React.FC<TableLogProps> = ({ filters }) => {
       setLoading(false);
     }
   };
-
-  if (loading) return <div className="flex justify-center items-center"> <CircleLoader /></div>;
-
   return (
     <div className="table-container flex flex-col gap-4">
       <Table>
@@ -131,7 +128,6 @@ const TableLog: React.FC<TableLogProps> = ({ filters }) => {
             <TableHead>Amount Overbooked</TableHead>
             <TableHead>Group Contains</TableHead>
             <TableHead>Earliest Due Date</TableHead>
-            
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -152,12 +148,15 @@ const TableLog: React.FC<TableLogProps> = ({ filters }) => {
               </TableCell>
               <TableCell>{invoice.pattern}</TableCell>
               <TableCell>{invoice.reference}</TableCell>
-              <TableCell>{invoice.confidence}</TableCell>
+              <TableCell>
+              <Badge variant="middle">{invoice.confidence}</Badge>
+              </TableCell>
               <TableCell>{invoice.vendor}</TableCell>
               <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
-              <TableCell>{invoice.open === true? "All Open": "All Close"}</TableCell>
+              <TableCell>
+                {invoice.open === true ? "All Open" : "All Close"}
+              </TableCell>
               <TableCell>{invoice.date}</TableCell>
-
             </TableRow>
           ))}
         </TableBody>

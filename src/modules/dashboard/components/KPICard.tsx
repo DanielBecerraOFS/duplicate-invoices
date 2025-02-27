@@ -9,7 +9,7 @@ export default function KPICard({
   data = 0,
 }) {
   return (
-    <Card className="flex-1 bg-card">
+    <Card className="flex-1 border-amber-300 border-1">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <TooltipInfoIcon />
