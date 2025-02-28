@@ -13,5 +13,5 @@ export { default as SelectTableFilter } from '@/modules/dashboard/components/Sel
 export { default as DashboardLayout } from '@/modules/dashboard/layout/DashboardLayout';
 //Services
 //Utils
-export { default as FormatDollar } from '@/modules/dashboard/utils/FormatDollar';
+export { default as FormatValues } from '@/modules/dashboard/utils/FormatValues';
 

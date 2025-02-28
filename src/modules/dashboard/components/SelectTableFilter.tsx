@@ -8,10 +8,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-export default function SelectTableFilter({
-    placeholder="Select an option",
-    label="Nombre Filtro"
-}) {
+interface SelectTableFilterProps {
+  placeholder: string;
+  label: string;
+  options: string[];
+}
+
+const SelectTableFilter: React.FC<SelectTableFilterProps> = ({ placeholder, label, options }) => {
   return (
     <Select>
       <SelectTrigger className="w-[250px] border-amber-300 ">
@@ -20,13 +23,15 @@ export default function SelectTableFilter({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>{label}</SelectLabel>
-          <SelectItem value="apple">Apple</SelectItem>
-          <SelectItem value="banana">Banana</SelectItem>
-          <SelectItem value="blueberry">Blueberry</SelectItem>
-          <SelectItem value="grapes">Grapes</SelectItem>
-          <SelectItem value="pineapple">Pineapple</SelectItem>
+          {
+            options.map((item) => {
+              return <SelectItem value={item}>{item}</SelectItem>
+            })
+          }
         </SelectGroup>
       </SelectContent>
     </Select>
   )
 }
+
+export default SelectTableFilter;

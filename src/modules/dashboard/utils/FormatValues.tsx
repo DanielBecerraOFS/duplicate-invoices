@@ -8,9 +8,9 @@
  * @param value - El valor numérico a formatear
  * @returns El valor formateado como string
  */
-const formatDollarValue = (value: number): string => {
+const formatValue = (value: number): string => {
     if (isNaN(value) || !isFinite(value)) {
-      return '$0';
+      return '0';
     }
   
     // Valores absolutos para manejar números negativos
@@ -18,11 +18,11 @@ const formatDollarValue = (value: number): string => {
     let formattedValue: string;
   
     if (absValue >= 1000000) {
-      formattedValue = `$${(absValue / 1000000).toFixed(1)}M`;
+      formattedValue = `${(absValue / 1000000).toFixed(1)}M`;
     } else if (absValue >= 1000) {
-      formattedValue = `$${(absValue / 1000).toFixed(1)}K`;
+      formattedValue = `${(absValue / 1000).toFixed(1)}K`;
     } else {
-      formattedValue = `$${absValue}`;
+      formattedValue = `${absValue}`;
     }
   
     // Eliminar el decimal si es .0
@@ -36,4 +36,4 @@ const formatDollarValue = (value: number): string => {
     return formattedValue;
   };
   
-  export default formatDollarValue;
+  export default formatValue;

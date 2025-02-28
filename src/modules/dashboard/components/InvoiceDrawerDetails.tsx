@@ -17,7 +17,9 @@ export default function InvoiceDrawerDetails({
   buttonTitle = "Group UUID",
   dataUUID = [],
 }) {
-  return (    
+  return (   
+    console.log(dataUUID),
+         
     <Drawer>  
       <DrawerTrigger asChild>
         <Button variant="ghost" className="text-blue-400 cursor-pointer">
@@ -38,7 +40,7 @@ export default function InvoiceDrawerDetails({
                 <div className="invoice-details-container flex flex-row justify-start gap-2">
                   <CardInvoiceDetails
                     title="Group UUID"
-                    value={dataUUID[0][0].groupUUID}
+                    value={dataUUID[0][0].group_id}
                   ></CardInvoiceDetails>
                   <CardInvoiceDetails
                     title="Confidence"
@@ -52,16 +54,16 @@ export default function InvoiceDrawerDetails({
                   ></CardInvoiceDetails>
                   <CardInvoiceDetails
                     title="Group Value"
-                    value={dataUUID[0][0].groupValue}
+                    value="40.00/$"
                     isCurrency={true}
                   ></CardInvoiceDetails>
                   <CardInvoiceDetails
                     title="Group Pattern"
-                    value={dataUUID[0][0].groupPattern}
+                    value={dataUUID[0][0].pattern}
                   ></CardInvoiceDetails>
                   <CardInvoiceDetails
                     title="Group Contains"
-                    value={dataUUID[0][0].groupContains}
+                    value={dataUUID[0][0].open === true ? "All Open" : "All Close"}
                   ></CardInvoiceDetails>
                 </div>
               </div>

@@ -17,28 +17,26 @@ export default function TableDrawerDetails({ dataGroup = [] }) {
             <Checkbox />
           </TableHead>
           <TableHead>Related Group</TableHead>
-          <TableHead>Number</TableHead>
-          <TableHead>Type</TableHead>
+{/*           <TableHead>Number</TableHead>
+          <TableHead>Type</TableHead> */}
           <TableHead>Reference</TableHead>
           <TableHead>Value</TableHead>
-          <TableHead>Currency</TableHead>
-          <TableHead>Vendor Number</TableHead>
+          <TableHead>Vendor</TableHead>
           <TableHead>Date</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {dataGroup.map((invoice) => (
-          <TableRow key={invoice.releatedGroup}>
+          <TableRow key={invoice.group_id}>
             <TableCell>
               <Checkbox />
             </TableCell>
-            <TableCell className="text-blue-400 cursor-pointer">{invoice.releatedGroup}</TableCell>
-            <TableCell>{invoice.docNumber}</TableCell>
-            <TableCell>{invoice.docType}</TableCell>
+            <TableCell className="text-blue-400 cursor-pointer">{invoice.group_id}</TableCell>
+{/*             <TableCell>{invoice.docNumber}</TableCell>
+            <TableCell>{invoice.docType}</TableCell> */}
             <TableCell>{invoice.reference}</TableCell>
-            <TableCell>{invoice.value}</TableCell>
-            <TableCell>{invoice.currency}</TableCell>
-            <TableCell>{invoice.vendorNumber}</TableCell>
+            <TableCell>$ {invoice.value}</TableCell>
+            <TableCell>{invoice.vendor}</TableCell>
             <TableCell>{invoice.date}</TableCell>
           </TableRow>
         ))}

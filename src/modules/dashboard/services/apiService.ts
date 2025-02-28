@@ -41,7 +41,7 @@ const apiClient = axios.create({
 
 export const getInvoices = async (filters: InvoiceFilters = {}): Promise<Invoice[]> => {
   try {
-    const response: AxiosResponse<Invoice[]> = await apiClient.get('/invoices/', { params: filters });
+    const response: AxiosResponse<Invoice[]> = await apiClient.get('/invoices/?random=true', { params: filters });
     return response.data;
   } catch (error) {
     console.error('Error fetching invoices:', error);

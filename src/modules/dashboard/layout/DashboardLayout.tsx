@@ -62,7 +62,6 @@ const DashboardLayout: React.FC =  () => {
         <div className="app-wrapper flex flex-col gap-4">
           <AppBar />
           <div className="flex justify-center items-center">
-            {" "}
             <CircleLoader />
           </div>
         </div>
@@ -79,17 +78,14 @@ const DashboardLayout: React.FC =  () => {
               Object.entries(kpiData).map(([key, value]) => (
                 <KPICard
                   title={key}
-                  data={value}
+                  data={parseFloat(value)}
                   isCurrency={key.includes("value") ? true : false}
                   legend="+20.1% from last month"
                 />
               ))}
           </div>
         </div>
-        <div className="filters-grid-contianer">
-          <TableLogFilters onFilterChange={handleFilterChange} />
-        </div>
-        <TabsTable invoices={invoices} />
+        <TabsTable data_invoices={invoices} />
       </div>
     </div>
   );

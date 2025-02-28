@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,108 +8,108 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import "./../../../../Celonis_DummyData.json";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
   InvoiceDrawerDetails,
   PaginationTable,
-  TableDrawerDetails,
-  TableLogFilters,
 } from "@/modules/dashboard/router";
 
-import {
-  getInvoices,
-  Invoice,
-  InvoiceFilters,
-} from "@/modules/dashboard/services/apiService";
-import { CircleLoader } from "react-spinners";
+import { Invoice } from "@/modules/dashboard/services/apiService";
 
-const data_details = [
+const results = [
   [
     {
-      groupUUID:
-        "dd1d3dd8183f13ece175a6510a820e74ed329955d22a1432f7dc8661e5ce0c1f",
-      groupPattern: "Similar Value",
+      reference: "INV-114",
+      date: "2025-03-03T00:00:00Z",
+      value: "343.30",
+      vendor: "CET New York",
+      pattern: "Exact Match",
+      open: true,
+      group_id:
+        "4b9650685f17f38b83546de673cb67991103f74862355b41e0046fa138bf49ea",
       confidence: "High",
-      companyCode: "3000",
-      vendor: "Acme Corportion",
-      groupValue: 17281.43596,
-      amountOverbooked: 8613.119279,
-      groupContains: "All Open",
-      earliestDueDate: "11-03-2025",
     },
   ],
   [
     {
-      releatedGroup:
-        "dd1d3dd8183f13ece175a6510a820e74ed329955d22a1432f7dc8661e5ce0c1f",
-      docNumber: 708443,
-      docType: "Standard",
-      reference: 1072746,
-      value: 10.0,
-      currency: "$",
-      vendorNumber: 1001149,
-      date: "11-02-2025",
+      reference: "INV-128",
+      date: "2024-05-05T00:00:00Z",
+      value: "343.30",
+      vendor: "Global Business Properties",
+      pattern: "Exact Match",
+      open: false,
+      group_id:
+        "e4ea486d7ab540f96d72efbc567702971ce32e560f24c857b920939c56aec62e",
+      confidence: "High",
     },
     {
-      releatedGroup:
-        "dd1d3dd8183f13ece175a6510a820e74ed329955d22a1432f7dc8661e5ce0c1f",
-      docNumber: "708443",
-      docType: "Standard",
-      reference: "1072746",
-      value: 10.0,
-      currency: "$",
-      vendorNumber: "1001149",
-      date: "11-02-2025",
+      reference: "INV-163",
+      date: "2025-03-13T00:00:00Z",
+      value: "300.00",
+      vendor: "PA Electronics",
+      pattern: "Exact Match",
+      open: true,
+      group_id:
+        "2d8be040c40f31f739ef395decb535cbe8b35a5648b6ef8b3d14ceb0d40bf08a",
+      confidence: "High",
     },
     {
-      releatedGroup:
-        "dd1d3dd8183f13ece175a6510a820e74ed329955d22a1432f7dc8661e5ce0c1f",
-      docNumber: "708443",
-      docType: "Standard",
-      reference: "1072746",
-      value: 10.0,
-      currency: "$",
-      vendorNumber: "1001149",
-      date: "11-02-2025",
+      reference: "INV-556",
+      date: "2025-03-10T00:00:00Z",
+      value: "317.22",
+      vendor: "Global Business Properties",
+      pattern: "Similar Value",
+      open: false,
+      group_id:
+        "b275adb85333247f69e829be66167a73c91561797fa564704e8ac27129518d18",
+      confidence: "Low",
     },
     {
-      releatedGroup:
-        "dd1d3dd8183f13ece175a6510a820e74ed329955d22a1432f7dc8661e5ce0c1f",
-      docNumber: "708443",
-      docType: "Standard",
-      reference: "1072746",
-      value: 10.0,
-      currency: "$",
-      vendorNumber: "1001149",
-      date: "11-02-2025",
+      reference: "INV-506",
+      date: "2025-03-05T00:00:00Z",
+      value: "181.18",
+      vendor: "Global Business Properties",
+      pattern: "Similar Value",
+      open: true,
+      group_id:
+        "126c4629d4f631fbd5c50063c45a091b434bac1a673b5737dfa738f713742500",
+      confidence: "Low",
+    },
+    {
+      reference: "INV-326",
+      date: "2024-11-22T00:00:00Z",
+      value: "300.00",
+      vendor: "kneifelinchen Sibylle",
+      pattern: "Exact Match",
+      open: true,
+      group_id:
+        "f75f474233e1a9aeb612606ec90b477c97f386a6238e54adfc4f952a65a3ac41",
+      confidence: "High",
     },
   ],
 ];
 interface TableLogProps {
-  filters: InvoiceFilters;
+  invoices: Invoice[];
 }
-const TableLog: React.FC<TableLogProps> = ({ filters }) => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
+  // Función para determinar la variante del Badge según el nivel de confianza
+  const getBadgeVariant = (
+    confidence: string
+  ): "default" | "high" | "medium" | "low" => {
+    // Convertir a minúsculas para comparación consistente
+    const confidenceLevel = confidence.toLowerCase();
 
-  useEffect(() => {
-    fetchInvoices();
-  }, [filters]);
-
-  const fetchInvoices = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const data = await getInvoices(filters);
-      console.log(data);
-
-      setInvoices(data.results);
-    } catch (error) {
-      // Manejar el error adecuadamente
-      console.error("Error al cargar facturas:", error);
-    } finally {
-      setLoading(false);
+    // Retornar la variante adecuada según el nivel de confianza
+    if (confidenceLevel === "high") {
+      return "high";
+    } else if (confidenceLevel === "medium") {
+      return "medium";
+    } else if (confidenceLevel === "low") {
+      return "low";
+    } else {
+      return "default"; // Variante por defecto para otros casos
     }
   };
   return (
@@ -143,13 +142,15 @@ const TableLog: React.FC<TableLogProps> = ({ filters }) => {
                     "..." +
                     invoice.group_id.slice(-6)
                   }
-                  dataUUID={data_details}
+                  dataUUID={results}
                 />
               </TableCell>
               <TableCell>{invoice.pattern}</TableCell>
               <TableCell>{invoice.reference}</TableCell>
               <TableCell>
-              <Badge variant="middle">{invoice.confidence}</Badge>
+                <Badge variant={getBadgeVariant(invoice.confidence)}>
+                  {invoice.confidence}
+                </Badge>
               </TableCell>
               <TableCell>{invoice.vendor}</TableCell>
               <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
