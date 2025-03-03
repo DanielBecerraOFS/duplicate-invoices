@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Flag } from "lucide-react";
+import formatValue from "../utils/FormatValues";
 
 export default function CardInvoiceDetails({
   title = "Invoice Detail Title",
@@ -19,7 +20,7 @@ export default function CardInvoiceDetails({
       </CardHeader>
       <CardContent className="flex flex-row items-center ">
         {icon === "high" && <Flag size={16} strokeWidth={1.5} />}
-        <p>{isCurrency ? `$ ${parseFloat(value).toFixed(2)}/$` : value}</p>
+        <p>{isCurrency ? `$ ${formatValue(Number(value))}/$` : value}</p>
       </CardContent>
     </Card>
   );

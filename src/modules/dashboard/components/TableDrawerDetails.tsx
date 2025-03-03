@@ -8,36 +8,44 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@radix-ui/react-checkbox";
-export default function TableDrawerDetails({ dataGroup = [] }) {
+import { getInvoices, Invoice } from "@/modules/dashboard/services/apiService";
+interface TableDrawerDetailsProps {
+  invoices_group: Invoice[];
+}
+
+const TableDrawerDetails: React.FC<TableDrawerDetailsProps> = ({
+  invoices_group,
+}) => {
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          <TableHead>
-            <Checkbox />
-          </TableHead>
-          <TableHead>Related Group</TableHead>
-{/*           <TableHead>Number</TableHead>
-          <TableHead>Type</TableHead> */}
-          <TableHead>Reference</TableHead>
-          <TableHead>Value</TableHead>
-          <TableHead>Vendor</TableHead>
+          <TableHead></TableHead>
+          <TableHead>Invoce Code</TableHead>
+          <TableHead>Region</TableHead>
           <TableHead>Date</TableHead>
+          <TableHead>Vendor</TableHead>
+          <TableHead>Amount</TableHead>
+          <TableHead>Payment Method</TableHead>
+          <TableHead>Vendor</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead>Special Instructions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {dataGroup.map((invoice) => (
-          <TableRow key={invoice.group_id}>
+        {invoices_group.map((invoice) => (
+          <TableRow>
             <TableCell>
               <Checkbox />
             </TableCell>
-            <TableCell className="text-blue-400 cursor-pointer">{invoice.group_id}</TableCell>
-{/*             <TableCell>{invoice.docNumber}</TableCell>
-            <TableCell>{invoice.docType}</TableCell> */}
             <TableCell>{invoice.reference}</TableCell>
-            <TableCell>$ {invoice.value}</TableCell>
-            <TableCell>{invoice.vendor}</TableCell>
+            <TableCell>{invoice.Region}</TableCell>
             <TableCell>{invoice.date}</TableCell>
+            <TableCell>{invoice.vendor}</TableCell>
+            <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
+            <TableCell>{invoice.Payment_Method}</TableCell>
+            <TableCell>{invoice.Description}</TableCell>
+            <TableCell>{invoice.Special_Instructions}</TableCell>
           </TableRow>
         ))}
       </TableBody>
@@ -46,4 +54,6 @@ export default function TableDrawerDetails({ dataGroup = [] }) {
       </TableFooter>
     </Table>
   );
-}
+};
+
+export default TableDrawerDetails;

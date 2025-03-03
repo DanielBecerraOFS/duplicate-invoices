@@ -11,9 +11,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import "./../../../../Celonis_DummyData.json";
 import { Checkbox } from "@/components/ui/checkbox";
+import { DateTime } from "luxon";
+
 import {
   InvoiceDrawerDetails,
-  PaginationTable,
 } from "@/modules/dashboard/router";
 
 import { Invoice } from "@/modules/dashboard/services/apiService";
@@ -94,6 +95,12 @@ interface TableLogProps {
   invoices: Invoice[];
 }
 const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
+  
+  const setFormatInvoiceDate = (date) =>{    
+    return  date.toLocaleString(DateTime.DATE_SHORT)
+  }
+  
+
   // Función para determinar la variante del Badge según el nivel de confianza
   const getBadgeVariant = (
     confidence: string
@@ -119,19 +126,21 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
         <TableHeader>
           <TableRow>
             <TableHead></TableHead>
-            <TableHead>Group UUID</TableHead>
-            <TableHead>Group Pattern</TableHead>
-            <TableHead>Reference</TableHead>
+            <TableHead>Group Code</TableHead>
+            <TableHead>Invoce Code</TableHead>
+            <TableHead>Region</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Pattern</TableHead>            
             <TableHead>Confidence</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Vendor</TableHead>
-            <TableHead>Amount Overbooked</TableHead>
-            <TableHead>Group Contains</TableHead>
-            <TableHead>Earliest Due Date</TableHead>
+            <TableHead>Amount</TableHead>         
+            <TableHead>Payment Method</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {invoices.map((invoice) => (
-            <TableRow key={invoice.reference}>
+            <TableRow>
               <TableCell>
                 <Checkbox />
               </TableCell>
@@ -142,22 +151,24 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
                     "..." +
                     invoice.group_id.slice(-6)
                   }
-                  dataUUID={results}
-                />
+                  group_uuid={invoice.group_id}                />
               </TableCell>
-              <TableCell>{invoice.pattern}</TableCell>
               <TableCell>{invoice.reference}</TableCell>
+              <TableCell>{invoice.Region}</TableCell>
+              <TableCell>{setFormatInvoiceDate(invoice.date)}</TableCell>
+              <TableCell>{invoice.pattern}</TableCell>              
               <TableCell>
                 <Badge variant={getBadgeVariant(invoice.confidence)}>
                   {invoice.confidence}
                 </Badge>
               </TableCell>
+              <TableCell>
+                {invoice.open === true ? "Open" : "Close"}
+              </TableCell>
               <TableCell>{invoice.vendor}</TableCell>
               <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
-              <TableCell>
-                {invoice.open === true ? "All Open" : "All Close"}
-              </TableCell>
-              <TableCell>{invoice.date}</TableCell>
+              
+              <TableCell>{invoice.Payment_Method}</TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -165,7 +176,6 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
           <TableRow></TableRow>
         </TableFooter>
       </Table>
-      <PaginationTable />
     </div>
   );
 };
