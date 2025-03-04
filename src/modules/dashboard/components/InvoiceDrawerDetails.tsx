@@ -16,9 +16,6 @@ import {
   CardInvoiceDetails,
   TableDrawerDetails,
 } from "@/modules/dashboard/router";
-import {
-  SonnerToastLog
-} from "@/modules/core/router";
 import { getInvoices, Invoice } from "@/modules/dashboard/services/apiService";
 
 
