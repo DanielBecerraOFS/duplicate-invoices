@@ -20,7 +20,7 @@ export default function CardInvoiceDetails({
       </CardHeader>
       <CardContent className="flex flex-row items-center ">
         {icon === "high" && <Flag size={16} strokeWidth={1.5} />}
-        <p>{isCurrency ? `$ ${formatValue(Number(value))}/$` : value}</p>
+        <p>{isCurrency ? `$ ${formatValue(Number(value))}` : value}</p>
       </CardContent>
     </Card>
   );

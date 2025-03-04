@@ -8,7 +8,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Checkbox } from "@radix-ui/react-checkbox";
-import { getInvoices, Invoice } from "@/modules/dashboard/services/apiService";
+import {
+  FormatInvoiceDate,
+  FormatValues
+} from "@/modules/dashboard/router";
+import { Invoice } from "@/modules/dashboard/services/apiService";
 interface TableDrawerDetailsProps {
   invoices_group: Invoice[];
 }
@@ -39,13 +43,13 @@ const TableDrawerDetails: React.FC<TableDrawerDetailsProps> = ({
               <Checkbox />
             </TableCell>
             <TableCell>{invoice.reference}</TableCell>
-            <TableCell>{invoice.Region}</TableCell>
-            <TableCell>{invoice.date}</TableCell>
+            <TableCell>{invoice.region}</TableCell>
+            <TableCell>{FormatInvoiceDate(invoice.date)}</TableCell>
             <TableCell>{invoice.vendor}</TableCell>
-            <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
-            <TableCell>{invoice.Payment_Method}</TableCell>
-            <TableCell>{invoice.Description}</TableCell>
-            <TableCell>{invoice.Special_Instructions}</TableCell>
+            <TableCell>${FormatValues(parseFloat(invoice.value))}</TableCell>
+            <TableCell>{invoice.payment_method}</TableCell>
+            <TableCell>{invoice.description}</TableCell>
+            <TableCell>{invoice.special_instructions}</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -1,6 +1,8 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CircleLoader } from "react-spinners";
+import { X } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -14,8 +16,16 @@ import {
   CardInvoiceDetails,
   TableDrawerDetails,
 } from "@/modules/dashboard/router";
-import { X } from "lucide-react";
+import {
+  SonnerToastLog
+} from "@/modules/core/router";
 import { getInvoices, Invoice } from "@/modules/dashboard/services/apiService";
+
+
+interface InvoiceDrawerProps {
+  buttonTitle: string;
+  group_uuid: string;
+}
 
 interface InvoiceDrawerProps {
   buttonTitle: string;
@@ -26,10 +36,8 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
   buttonTitle,
   group_uuid,
 }) => {
-  
-  
   const [invoices, setGroupInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // Para la carga inicial
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchInvoices = async (): Promise<void> => {
     setLoading(true);
@@ -37,22 +45,88 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       const filters = {
         group_id: group_uuid,
       };
-      const response = await getInvoices(filters);
-      console.log(response);
-      
+      const response = await getInvoices(filters);      
       setGroupInvoices(response.results);
     } catch (error) {
       console.error("Error al cargar facturas:", error);
+      // Optionally add error handling (e.g., toast notification)
     } finally {
       setLoading(false);
     }
+  };  
+
+  // Render loader for card details
+  const renderCardDetails = () => {
+    if (loading) {
+      return (
+        <div className="w-full flex justify-center items-center py-4">
+          <CircleLoader color="#3B82F6" />
+        </div>
+      );
+    }
+
+    if (!invoices || invoices.length === 0) {
+      return (
+        <div className="text-gray-500 text-center py-4">
+          No invoice details available
+        </div>
+      );
+    }
+
+    return (
+      <div className="invoice-details-container flex flex-row justify-start gap-2">
+        <CardInvoiceDetails
+          title="Confidence"
+          value={invoices[0].confidence}
+          status={
+            invoices[0].confidence === "High" ? "danger" : "default"
+          }
+          icon="high"
+        />
+        <CardInvoiceDetails
+          title="Group Value"
+          value={invoices
+            .reduce(
+              (total, invoice) =>
+                total + (Number(invoice.value) || 0),
+              0
+            )
+            .toString()}
+          isCurrency={true}
+        />
+        <CardInvoiceDetails
+          title="Group Pattern"
+          value={invoices[0].pattern}
+        />
+        <CardInvoiceDetails
+          title="Group Contains"
+          value={
+            invoices[0].open === true ? "Open" : "Close"
+          }
+        />
+      </div>
+    );
   };
+
+  // Render loader for table
+  const renderTableContent = () => {
+    if (loading) {
+      return (
+        <div className="w-full flex justify-center items-center py-4">
+          <CircleLoader color="#3B82F6" />
+        </div>
+      );
+    }
+
+    return <TableDrawerDetails invoices_group={invoices} />;
+  };
+
   return (
     <Drawer>
       <DrawerTrigger asChild>
         <Button
           variant="ghost"
-          className="text-blue-400 cursor-pointer"
+          className="text-blue-400 cursor-pointer p-0 hover:underline decoration-solid"
           onClick={fetchInvoices}
         >
           {buttonTitle}
@@ -69,43 +143,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
             </div>
             <DrawerDescription>
               <div className="wrapper-description flex flex-col gap-4">
-                {invoices && invoices.length > 0 && (
-                  <div className="invoice-details-container flex flex-row justify-start gap-2">
-                    <CardInvoiceDetails
-                      title="Group UUID"
-                      value={invoices[0].group_id}
-                    ></CardInvoiceDetails>
-                    <CardInvoiceDetails
-                      title="Confidence"
-                      value={invoices[0].confidence}
-                      status={
-                        invoices[0].confidence === "High" ? "danger" : "default"
-                      }
-                      icon="high"
-                    ></CardInvoiceDetails>
-                    <CardInvoiceDetails
-                      title="Group Value"
-                      value={invoices
-                        .reduce(
-                          (total, invoice) =>
-                            total + (Number(invoice.value) || 0),
-                          0
-                        )
-                        .toString()}
-                      isCurrency={true}
-                    ></CardInvoiceDetails>
-                    <CardInvoiceDetails
-                      title="Group Pattern"
-                      value={invoices[0].pattern}
-                    ></CardInvoiceDetails>
-                    <CardInvoiceDetails
-                      title="Group Contains"
-                      value={
-                        invoices[0].open === true ? "Open" : "Close"
-                      }
-                    ></CardInvoiceDetails>
-                  </div>
-                )}
+                {renderCardDetails()}
               </div>
             </DrawerDescription>
           </DrawerHeader>
@@ -122,7 +160,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
                   <Button variant="outline">No Action Required</Button>
                 </div>
               </div>
-              <TableDrawerDetails invoices_group={invoices} />
+              {renderTableContent()}
             </div>
           </div>
         </div>
