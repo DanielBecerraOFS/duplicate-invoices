@@ -16,16 +16,20 @@ interface Invoice {
   payment_method:string;
   description:string;
   special_instructions:string;
+  accuracy: number;
 }
 
 interface InvoiceResponse{
-  response: Invoice[];
+  results: Invoice[];
   count: number;
-
 }
 
 interface KPI {
   [key: string]: number | string;
+}
+
+interface Agent {
+  response: string;
 }
 
 interface InvoiceFilters {
@@ -41,7 +45,14 @@ interface InvoiceFilters {
   confidence?:string;
 }
 
-const API_URL = 'https://invoice-ofiservices.pythonanywhere.com/api/';
+interface InvoicesMetadata {
+  reference_values: string[];
+  vendor_values: string[];
+  pattern_values: string[];
+  date_values: string[];
+}
+
+const API_URL = 'https://invoice-ofiservices.pythonanywhere.com/';
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -50,9 +61,9 @@ const apiClient = axios.create({
   },
 });
 
-export const getInvoices = async (filters: InvoiceFilters = {}): Promise<Invoice[]> => {
+export const getInvoices = async (filters: InvoiceFilters = {}): Promise<InvoiceResponse> => {
   try {
-    const response: AxiosResponse<Invoice[]> = await apiClient.get('/invoices/', { params: filters });
+    const response: AxiosResponse<InvoiceResponse> = await apiClient.get('/api/invoices/', { params: filters });
     return response.data;
   } catch (error) {
     console.error('Error fetching invoices:', error);
@@ -60,14 +71,35 @@ export const getInvoices = async (filters: InvoiceFilters = {}): Promise<Invoice
   }
 };
 
-
-export const getKPIs = async (): Promise<KPI> => {
+export const getInvoicesMetadata = async (): Promise<InvoicesMetadata> => {
   try {
-    const response: AxiosResponse<KPI> = await apiClient.get('/kpis/');
+    const response: AxiosResponse<InvoicesMetadata> = await apiClient.get('/api/metadata/');
     return response.data;
   } catch (error) {
     console.error('Error fetching KPIs:', error);
     throw error;
   }
 };
-export type { Invoice, KPI, InvoiceFilters, InvoiceResponse };
+
+export const getAgentResponse = async (message:string): Promise<Agent> => {
+  try {
+    const response: AxiosResponse<Agent> = await apiClient.post('/ai/ai_assistant/', {message: message} );
+    console.log("Response",response);
+    
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching agent response:', error);
+    throw error;
+  }
+};
+
+export const getKPIs = async (): Promise<KPI> => {
+  try {
+    const response: AxiosResponse<KPI> = await apiClient.get('/api/kpis/');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching KPIs:', error);
+    throw error;
+  }
+};
+export type { Invoice, KPI, InvoiceFilters, InvoiceResponse, InvoicesMetadata, Agent };

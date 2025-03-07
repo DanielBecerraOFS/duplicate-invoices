@@ -16,13 +16,8 @@ import {
   CardInvoiceDetails,
   TableDrawerDetails,
 } from "@/modules/dashboard/router";
-import { getInvoices, Invoice } from "@/modules/dashboard/services/apiService";
+import { getInvoices, InvoiceResponse } from "@/modules/dashboard/services/apiService";
 
-
-interface InvoiceDrawerProps {
-  buttonTitle: string;
-  group_uuid: string;
-}
 
 interface InvoiceDrawerProps {
   buttonTitle: string;
@@ -33,7 +28,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
   buttonTitle,
   group_uuid,
 }) => {
-  const [invoices, setGroupInvoices] = useState<Invoice[]>([]);
+  const [invoices, setGroupInvoices] = useState<InvoiceResponse>();
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchInvoices = async (): Promise<void> => {
@@ -43,7 +38,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
         group_id: group_uuid,
       };
       const response = await getInvoices(filters);      
-      setGroupInvoices(response.results);
+      setGroupInvoices(response);
     } catch (error) {
       console.error("Error al cargar facturas:", error);
       // Optionally add error handling (e.g., toast notification)
@@ -62,7 +57,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       );
     }
 
-    if (!invoices || invoices.length === 0) {
+    if (!invoices || invoices.results.length === 0) {
       return (
         <div className="text-gray-500 text-center py-4">
           No invoice details available
@@ -74,15 +69,15 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       <div className="invoice-details-container flex flex-row justify-start gap-2">
         <CardInvoiceDetails
           title="Confidence"
-          value={invoices[0].confidence}
+          value={invoices.results[0].confidence}
           status={
-            invoices[0].confidence === "High" ? "danger" : "default"
+            invoices.results[0].confidence === "High" ? "danger" : "default"
           }
           icon="high"
         />
         <CardInvoiceDetails
           title="Group Value"
-          value={invoices
+          value={invoices.results
             .reduce(
               (total, invoice) =>
                 total + (Number(invoice.value) || 0),
@@ -93,12 +88,12 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
         />
         <CardInvoiceDetails
           title="Group Pattern"
-          value={invoices[0].pattern}
+          value={invoices.results[0].pattern}
         />
         <CardInvoiceDetails
           title="Group Contains"
           value={
-            invoices[0].open === true ? "Open" : "Close"
+            invoices.results[0].open === true ? "Open" : "Close"
           }
         />
       </div>
@@ -115,7 +110,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       );
     }
 
-    return <TableDrawerDetails invoices_group={invoices} />;
+    return invoices ? <TableDrawerDetails invoices_group={invoices.results} /> : null;
   };
 
   return (

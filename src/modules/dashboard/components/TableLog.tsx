@@ -14,18 +14,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 
 import {
   InvoiceDrawerDetails,
-  FormatInvoiceDate
+  FormatInvoiceDate,
 } from "@/modules/dashboard/router";
 
 import { Invoice } from "@/modules/dashboard/services/apiService";
-
+import { TolltipInfoHover } from "@/modules/core/router";
 
 interface TableLogProps {
   invoices: Invoice[];
 }
 const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
-
-  // Función para determinar la variante del Badge según el nivel de confianza
   const getBadgeVariant = (
     confidence: string
   ): "default" | "high" | "medium" | "low" => {
@@ -46,20 +44,22 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
   return (
     <div className="table-container flex flex-col gap-4">
       <Table>
-        <TableCaption>{
-              invoices.length == 0 ? "No data available to display": `${invoices.length} available data found`
-            }</TableCaption>
+        <TableCaption>
+          {invoices.length == 0
+            ? "No data available to display"
+            : `${invoices.length} available data found`}
+        </TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead></TableHead>
-            <TableHead>Pattern</TableHead> 
+            <TableHead>Pattern</TableHead>
             <TableHead>Invoce Code</TableHead>
             <TableHead>Region</TableHead>
             <TableHead>Date</TableHead>
             <TableHead>Confidence</TableHead>
             <TableHead>Status</TableHead>
             <TableHead>Vendor</TableHead>
-            <TableHead>Amount</TableHead>         
+            <TableHead>Amount</TableHead>
             <TableHead>Payment Method</TableHead>
           </TableRow>
         </TableHeader>
@@ -71,34 +71,37 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
               </TableCell>
               <TableCell>
                 <InvoiceDrawerDetails
-                  buttonTitle={invoice.pattern
-                    /* invoice.group_id.substring(0, 6) +
-                    "..." +
-                    invoice.group_id.slice(-6) */
-                  }
-                  group_uuid={invoice.group_id}                />
+                  buttonTitle={invoice.pattern}
+                  group_uuid={invoice.group_id}
+                />
               </TableCell>
               <TableCell>{invoice.reference}</TableCell>
               <TableCell>{invoice.region}</TableCell>
-              <TableCell>{FormatInvoiceDate(invoice.date)}</TableCell>            
+              <TableCell>{FormatInvoiceDate(invoice.date)}</TableCell>
               <TableCell>
-                <Badge variant={getBadgeVariant(invoice.confidence)}>
-                  {invoice.confidence}
-                </Badge>
+                <TolltipInfoHover
+                  action={null}
+                  content="Accurrancy Level"
+                  title={invoice.accuracy.toLocaleString()}
+                >
+                  <Badge
+                    variant={getBadgeVariant(invoice.confidence)}
+                    className="cursor-pointer"
+                  >
+                    {invoice.confidence}
+                  </Badge>
+                </TolltipInfoHover>
               </TableCell>
-              <TableCell>
-                {invoice.open === true ? "Open" : "Close"}
-              </TableCell>
+              <TableCell>{invoice.open === true ? "Open" : "Close"}</TableCell>
               <TableCell>{invoice.vendor}</TableCell>
               <TableCell>${parseFloat(invoice.value).toFixed(2)}</TableCell>
-              
+
               <TableCell>{invoice.payment_method}</TableCell>
             </TableRow>
           ))}
         </TableBody>
         <TableFooter>
-          <TableRow>
-          </TableRow>
+          <TableRow></TableRow>
         </TableFooter>
       </Table>
     </div>

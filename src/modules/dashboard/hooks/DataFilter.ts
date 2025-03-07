@@ -7,7 +7,7 @@ const useDataFilter = <T>(
     const [filters, setFilters] = useState<Partial<Record<keyof T, any>>>({});
     
     const filteredData = useMemo(() => {
-      return initialData.filter(item => 
+      return initialData.filter(() => 
         Object.entries(filters).every(([key, value]) => 
           value ? filterConfig[key as keyof T](value) : true
         )

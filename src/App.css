@@ -5,7 +5,6 @@
   padding: 0;
 }
 
-
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
@@ -18,4 +17,19 @@
 
 .read-the-docs {
   color: #888;
+}
+
+.carrusel-card {
+  animation: shadow-drop-center 1s cubic-bezier(0.860, 0.000, 0.070, 1.000) infinite alternate both;
+}
+
+@keyframes shadow-drop-center {
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba(207, 0, 0, 0);
+            box-shadow: 0 0 0 0 rgba(207, 0, 0, 0);
+  }
+  100% {
+    -webkit-box-shadow: 0 0 15px 0px rgba(207, 0, 0, 0.35);
+            box-shadow: 0 0 15px 0px rgba(207, 0, 0, 0.35);
+  }
 }

@@ -7,10 +7,12 @@ export { default as PaginationTable } from '@/modules/dashboard/components/Pagin
 export { default as InvoiceDrawerDetails } from '@/modules/dashboard/components/InvoiceDrawerDetails';
 export { default as CardInvoiceDetails } from '@/modules/dashboard/components/CardInvoiceDetails';
 export { default as TableDrawerDetails } from '@/modules/dashboard/components/TableDrawerDetails';
-export { default as TableLogFilters } from '@/modules/dashboard/components/TableLogFilters';
 export { default as SelectTableFilter } from '@/modules/dashboard/components/SelectTableFilter';
+export { default as AssistentSheet } from "@/modules/dashboard/components/AssistentSheet"
+export { default as FloatingButton } from "@/modules/dashboard/components/FloatingButton"
+export { default as RecommendsCarrousel } from "@/modules/dashboard/components/RecommendsCarrousel"
 //Hooks
-export { default as useDataFetch} from "@/modules/dashboard/hooks/dataFetch"
+/* export { default as useDataFetch} from "@/modules/dashboard/hooks/dataFetch" */
 export { default as useDataFilter} from "@/modules/dashboard/hooks/DataFilter"
 //Layouts
 export { default as DashboardLayout } from '@/modules/dashboard/layout/DashboardLayout';

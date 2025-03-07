@@ -1,9 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-} from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { CircleLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +6,15 @@ import {
   KPICard,
   PaginationTable,
   SelectTableFilter,
+  RecommendsCarrousel,
 } from "@/modules/dashboard/router";
 import {
   getKPIs,
   KPI,
   Invoice,
   getInvoices,
+  InvoicesMetadata,
+  getInvoicesMetadata,
 } from "@/modules/dashboard/services/apiService";
 import { SonnerToastLog } from "@/modules/core/router";
 import axios from "axios";
@@ -29,6 +27,7 @@ const Dashboard: React.FC = () => {
   // Initial state with type safety
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [kpiData, setKpiData] = useState<KPI | null>(null);
+  const [metadata, setInvoicesMetadata] = useState<InvoicesMetadata>();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [paginationLoading, setPaginationLoading] = useState<boolean>(false);
   const [filters, setCurrentFilters] = useState<Record<string, string>>({});
@@ -52,7 +51,7 @@ const Dashboard: React.FC = () => {
     () => ({
       reference: [...new Set(invoices.map((invoice) => invoice.reference))],
       pattern: [...new Set(invoices.map((invoice) => invoice.pattern))],
-      confidence: [...new Set(invoices.map((invoice) => invoice.confidence))],
+      confidence: ["High", "Medium", "Low"],
       date: [...new Set(invoices.map((invoice) => invoice.date))],
       vendor: [...new Set(invoices.map((invoice) => invoice.vendor))],
     }),
@@ -108,7 +107,10 @@ const Dashboard: React.FC = () => {
 
     setPaginationLoading(true);
     try {
-      const params = { ...filters };
+      const params = {
+        ...filters,
+        page: currentPage,
+      };
 
       const response = await getInvoices(params);
       setInvoices(response.results);
@@ -119,6 +121,21 @@ const Dashboard: React.FC = () => {
       setPaginationLoading(false);
     }
   }, [currentPage, filters, initialLoading, itemsPerPage]);
+
+  const fetchInvoicesMetadata = useCallback(async (): Promise<void> => {
+    if (initialLoading) return;
+
+    setPaginationLoading(true);
+    try {
+      const filters = await getInvoicesMetadata();
+      console.log(filters);
+      setInvoicesMetadata(filters);
+    } catch (error) {
+      console.error("Error al cargar facturas:", error);
+    } finally {
+      setPaginationLoading(false);
+    }
+  }, []);
 
   // Initial data load
   useEffect(() => {
@@ -131,59 +148,63 @@ const Dashboard: React.FC = () => {
         const response = await getInvoices({
           page: 1,
         });
-
         setInvoices(response.results);
         setTotalPages(Math.ceil(response.count / itemsPerPage) || 1);
+
+        const filters = await getInvoicesMetadata();
+        setInvoicesMetadata(filters);
       } catch (error) {
         if (axios.isAxiosError(error)) {
-            if (error.response) {
-              switch (error.response.status) {
-                case 404:
-                  toast.error('An Error found trying to retrieve information', {
-                    description: "It's look like a problem with the GET Protocol ",
-                    action: {
-                      label: "Try again",
-                      onClick: () => console.log("Undo"),
-                    },
-                  });
-                  break;
-                case 500:
-                    toast.error('An Error found with the server', {
-                        description: "It's look like a problem about server communication",
-                        action: {
-                          label: "Try again",
-                          onClick: () => console.log("Undo"),
-                        },
-                      });
-                  break;
-                default:
-                    toast.error('An Error found to load information', {
-                        description: "It's look like a runtime problem",
-                        action: {
-                          label: "Try again",
-                          onClick: () => console.log("Undo"),
-                        },
-                      });
-              }
-            } else if (error.request) {
-              toast.error('An Error found with yout internet conection', {
-                description: "Check your WiFi conection",
-                action: {
-                  label: "Try again",
-                  onClick: () => console.log("Undo"),
-                },
-              });
-            } else {
-                toast.error('An Error found with the request', {
-                    description: "We are collecting error information. Please try again later",
-                    action: {
-                      label: "Ok",
-                      onClick: () => console.log("Undo"),
-                    },
-                  });
+          if (error.response) {
+            switch (error.response.status) {
+              case 404:
+                toast.error("An Error found trying to retrieve information", {
+                  description:
+                    "It's look like a problem with the GET Protocol ",
+                  action: {
+                    label: "Try again",
+                    onClick: () => console.log("Undo"),
+                  },
+                });
+                break;
+              case 500:
+                toast.error("An Error found with the server", {
+                  description:
+                    "It's look like a problem about server communication",
+                  action: {
+                    label: "Try again",
+                    onClick: () => console.log("Undo"),
+                  },
+                });
+                break;
+              default:
+                toast.error("An Error found to load information", {
+                  description: "It's look like a runtime problem",
+                  action: {
+                    label: "Try again",
+                    onClick: () => console.log("Undo"),
+                  },
+                });
             }
+          } else if (error.request) {
+            toast.error("An Error found with yout internet conection", {
+              description: "Check your WiFi conection",
+              action: {
+                label: "Try again",
+                onClick: () => console.log("Undo"),
+              },
+            });
+          } else {
+            toast.error("An Error found with the request", {
+              description:
+                "We are collecting error information. Please try again later",
+              action: {
+                label: "Ok",
+                onClick: () => console.log("Undo"),
+              },
+            });
           }
-
+        }
       } finally {
         setInitialLoading(false);
       }
@@ -198,7 +219,19 @@ const Dashboard: React.FC = () => {
     if (!initialLoading) {
       fetchInvoices();
     }
-  }, [filters, currentPage, fetchInvoices, initialLoading]);
+  }, [
+    filters,
+    currentPage,
+    fetchInvoices,
+    initialLoading,
+    metadata,
+    fetchInvoicesMetadata,
+  ]);
+  useEffect(() => {
+    if (!initialLoading) {
+      fetchInvoicesMetadata();
+    }
+  }, [filters, fetchInvoicesMetadata, initialLoading]);
 
   // Loading state
   if (initialLoading)
@@ -215,8 +248,13 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     );
-  return (
+  return (    
+    console.log(metadata),
+    
     <div className="grid-content">
+      <div className="recommends-on-start-container my-3">
+        <RecommendsCarrousel />
+      </div>
       <div className="kpi-grid-content">
         <div className="flex flex-row justify-between gap-2 flex-wrap">
           {kpiData &&
@@ -235,41 +273,45 @@ const Dashboard: React.FC = () => {
         <div className="filter-wrapper py-1 hidden md:block">
           <h3 className="font-medium mb-4">Filters</h3>
           <div className="filter-items-grid flex flex-row gap-2">
-            <SelectTableFilter
-              placeholder="Por referencia"
-              label="Referencia"
-              options={filterOptions.reference}
-              value={filterValues.reference}
-              onChange={(value) => handleSelectChange("reference", value)}
-            />
-            <SelectTableFilter
-              placeholder="Por pattern"
-              label="Pattern"
-              options={filterOptions.pattern}
-              value={filterValues.pattern}
-              onChange={(value) => handleSelectChange("pattern", value)}
-            />
-            <SelectTableFilter
-              placeholder="Por confidence"
-              label="Confidence Level"
-              options={filterOptions.confidence}
-              value={filterValues.confidence}
-              onChange={(value) => handleSelectChange("confidence", value)}
-            />
-            <SelectTableFilter
-              placeholder="Por vendor"
-              label="Vendor"
-              options={filterOptions.vendor}
-              value={filterValues.vendor}
-              onChange={(value) => handleSelectChange("vendor", value)}
-            />
-            <SelectTableFilter
-              placeholder="Por fecha"
-              label="Fecha"
-              options={filterOptions.date}
-              value={filterValues.date}
-              onChange={(value) => handleSelectChange("date", value)}
-            />
+            {metadata && (
+              <div className="flex flex-row gap-2">
+                <SelectTableFilter
+                  placeholder="By Reference"
+                  label="Reference"
+                  options={metadata.reference_values}
+                  value={filterValues.reference}
+                  onChange={(value) => handleSelectChange("reference", value)}
+                />
+                <SelectTableFilter
+                  placeholder="BY Pattern"
+                  label="Pattern"
+                  options={metadata.pattern_values}
+                  value={filterValues.pattern}
+                  onChange={(value) => handleSelectChange("pattern", value)}
+                />
+                <SelectTableFilter
+                  placeholder="By Confidence"
+                  label="Confidence Level"
+                  options={filterOptions.confidence}
+                  value={filterValues.confidence}
+                  onChange={(value) => handleSelectChange("confidence", value)}
+                />
+                <SelectTableFilter
+                  placeholder="By Vendor"
+                  label="Vendor Name"
+                  options={metadata.vendor_values}
+                  value={filterValues.vendor}
+                  onChange={(value) => handleSelectChange("vendor", value)}
+                />
+                <SelectTableFilter
+                  placeholder="By Date"
+                  label="Dates"
+                  options={metadata.date_values}
+                  value={filterValues.date}
+                  onChange={(value) => handleSelectChange("date", value)}
+                />
+              </div>
+            )}
             <div className="flex gap-2">
               <Button
                 variant="default"
@@ -301,6 +343,7 @@ const Dashboard: React.FC = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={(page) => {
+          console.log(page);
           setCurrentPage(page);
           setPaginationLoading(true);
         }}

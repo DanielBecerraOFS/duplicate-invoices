@@ -17,7 +17,6 @@ const TabsTable: React.FC<TabsTableProps> = ({ data_invoices }) => {
           <TableLog invoices={data_invoices}/>
         </TabsContent>
         <TabsContent value="resolved-tab">
-          <TableLog invoices={data_invoices} />
         </TabsContent>
       </Tabs>
     </div>

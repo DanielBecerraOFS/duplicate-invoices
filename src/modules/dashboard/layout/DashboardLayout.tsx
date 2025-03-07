@@ -1,9 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
-import {
-  AppBar,
-  Dashboard,
-} from "@/modules/dashboard/router";
-
+import { AppBar, Dashboard, FloatingButton } from "@/modules/dashboard/router";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const DashboardLayout: React.FC = () => {
   return (
@@ -11,8 +8,11 @@ const DashboardLayout: React.FC = () => {
       <div className="app-wrapper flex flex-col gap-4">
         <AppBar />
         <main className="main-content">
-          <Dashboard/>
+          <TooltipProvider>
+            <Dashboard />
+          </TooltipProvider>
         </main>
+        <FloatingButton />
         <Toaster />
       </div>
     </div>
