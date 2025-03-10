@@ -7,9 +7,14 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import React from "react";
 import HeadChatbotOFIA from "@/assets/ofia-chatbot-head.png";
-import { Button } from "@/components/ui/button";
-
-export default function RecommendsCarrousel() {
+import { AgentAlerts } from "@/modules/dashboard/services/apiService";
+import {AssistentSheet} from "@/modules/dashboard/router";
+interface RecommendsCarrouselProps{
+  alerts: AgentAlerts
+}
+const RecommendsCarrousel: React.FC <RecommendsCarrouselProps> = ({
+  alerts
+}) =>{
   const plugin = React.useRef(
     Autoplay({ delay: 10000, stopOnInteraction: true })
   );
@@ -39,24 +44,21 @@ export default function RecommendsCarrousel() {
               orientation="horizontal"
             >
               <CarouselContent className="">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <CarouselItem key={index} className="p-7">
-                    <div className="flex flex-col justify-start items-start p-0 gap-3">
-                      <h3 className="card-title">
-                        We have detected an anomaly in recents invoices
-                      </h3>
-                      <div className="flex flex-col justify-start items-start ">
-                        <p>
-                          <strong>New Invoices today: </strong> 26
-                        </p>
-                        <p>
-                          <strong>Possible duplicate invoices:</strong> 15
-                        </p>
-                      </div>
-                      <Button variant="default">✨Review with sOfIA✨</Button>
+                {
+                  <CarouselItem key={alerts.Alert.UUID} className="p-7">
+                  <div className="flex flex-col justify-start items-start p-0 gap-3">
+                    <h3 className="card-title font-bold">
+                      We have detected an anomaly in recents invoices
+                    </h3>
+                    <div className="flex flex-col justify-start items-start ">
+                      <p>
+                        {alerts.Alert.message}
+                      </p>
                     </div>
-                  </CarouselItem>
-                ))}
+                    <AssistentSheet type="button" initialMessage="Explain to me the last anomaly founded" params={{goup_uuid: alerts.Alert.UUID}} />
+                  </div>
+                </CarouselItem>
+                }
               </CarouselContent>
             </Carousel>
           </CardContent>
@@ -65,3 +67,5 @@ export default function RecommendsCarrousel() {
     </div>
   );
 }
+
+export default RecommendsCarrousel;

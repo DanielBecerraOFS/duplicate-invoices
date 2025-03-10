@@ -15,6 +15,8 @@ import {
   getInvoices,
   InvoicesMetadata,
   getInvoicesMetadata,
+  getAgentAlerts,
+  AgentAlerts,
 } from "@/modules/dashboard/services/apiService";
 import { SonnerToastLog } from "@/modules/core/router";
 import axios from "axios";
@@ -28,6 +30,7 @@ const Dashboard: React.FC = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [kpiData, setKpiData] = useState<KPI | null>(null);
   const [metadata, setInvoicesMetadata] = useState<InvoicesMetadata>();
+  const [alerts, setAgentAlerts] = useState<AgentAlerts>();
   const [initialLoading, setInitialLoading] = useState<boolean>(true);
   const [paginationLoading, setPaginationLoading] = useState<boolean>(false);
   const [filters, setCurrentFilters] = useState<Record<string, string>>({});
@@ -128,8 +131,19 @@ const Dashboard: React.FC = () => {
     setPaginationLoading(true);
     try {
       const filters = await getInvoicesMetadata();
-      console.log(filters);
       setInvoicesMetadata(filters);
+    } catch (error) {
+      console.error("Error al cargar facturas:", error);
+    } finally {
+      setPaginationLoading(false);
+    }
+  }, []);
+
+  const fetchAgentAlerts = useCallback(async (): Promise<void> => {
+    if (initialLoading) return;
+    try {
+      const alerts = await getAgentAlerts();
+      setAgentAlerts(alerts);
     } catch (error) {
       console.error("Error al cargar facturas:", error);
     } finally {
@@ -144,6 +158,10 @@ const Dashboard: React.FC = () => {
       try {
         const kpiData = await getKPIs();
         setKpiData(kpiData);
+
+        const alerts = await getAgentAlerts();
+        console.log(alerts);
+        setAgentAlerts(alerts);
 
         const response = await getInvoices({
           page: 1,
@@ -233,6 +251,12 @@ const Dashboard: React.FC = () => {
     }
   }, [filters, fetchInvoicesMetadata, initialLoading]);
 
+  useEffect(() => {
+    if (!initialLoading) {
+      fetchAgentAlerts();
+    }
+  }, [alerts, fetchAgentAlerts, initialLoading]);
+
   // Loading state
   if (initialLoading)
     return (
@@ -248,12 +272,10 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     );
-  return (    
-    console.log(metadata),
-    
+  return (
     <div className="grid-content">
       <div className="recommends-on-start-container my-3">
-        <RecommendsCarrousel />
+        {alerts && <RecommendsCarrousel alerts={alerts} />}
       </div>
       <div className="kpi-grid-content">
         <div className="flex flex-row justify-between gap-2 flex-wrap">
@@ -261,9 +283,27 @@ const Dashboard: React.FC = () => {
             Object.entries(kpiData).map(([key, value]) => (
               <KPICard
                 key={key}
-                title={key}
+                title={key
+                  .replace("total_similar_invoices", "Total Similar Invoices")
+                  .replace(
+                    "total_open_similar_invoices",
+                    "Total Open Similar Invoices"
+                  )
+                  .replace(
+                    "total_value_of_similar_invoices",
+                    "Total Value of Similar Invoices"
+                  )
+                  .replace(
+                    "total_value_of_open_similar_invoices",
+                    "Total Value of Open Similar Invoices"
+                  )}
                 data={Number(value)}
-                isCurrency={key.includes("value")}
+                isCurrency={
+                  key == "total_open_similar_invoices" ||
+                  key == "total_value_of_similar_invoices"
+                    ? true
+                    : false
+                }
                 legend="+20.1% from last month"
               />
             ))}
@@ -343,7 +383,6 @@ const Dashboard: React.FC = () => {
         currentPage={currentPage}
         totalPages={totalPages}
         onPageChange={(page) => {
-          console.log(page);
           setCurrentPage(page);
           setPaginationLoading(true);
         }}

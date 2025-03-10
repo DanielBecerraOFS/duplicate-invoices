@@ -31,7 +31,7 @@ const SelectTableFilter: React.FC<SelectTableFilterProps> = ({
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
-          <SelectGroup>
+          <SelectGroup key={label}>
             <SelectLabel>{label}</SelectLabel>
             {options.map((item) => {
               return <SelectItem value={item}>{item}</SelectItem>;

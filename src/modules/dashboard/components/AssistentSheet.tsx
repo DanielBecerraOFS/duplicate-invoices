@@ -15,12 +15,23 @@ import ChatBotBody from "@/assets/ofia-chatbot.png";
 import HeadChatbotOFIA from "@/assets/ofia-chatbot-head.png";
 import { TolltipInfoHover } from "@/modules/core/router";
 import { getAgentResponse } from "../services/apiService";
+import InvoiceDrawerDetails from "./InvoiceDrawerDetails";
 
 interface Message {
   id: number;
-  text: string;
+  text: {
+    message: string;
+    action: string;
+    params: string;
+  };
   sender: "user" | "agent";
   isTyping?: boolean;
+}
+
+interface AssistentSheetProps {
+  type: string;
+  initialMessage: string;
+  params: {};
 }
 
 const TypingDots: React.FC = () => {
@@ -46,10 +57,13 @@ const TypingDots: React.FC = () => {
   );
 };
 
-const AssistentSheet = () => {
+const AssistentSheet: React.FC<AssistentSheetProps> = ({
+  type = "toltip",
+  initialMessage,
+}) => {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   var [messages, setMessages] = useState<Message[]>([]);
-  const [inputMessage, setInputMessage] = useState("");
+  const [inputMessage, setInputMessage] = useState(initialMessage || "");
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -60,104 +74,183 @@ const AssistentSheet = () => {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = () => {
-    if (inputMessage.trim() === "") return;
+  // Efecto para manejar el mensaje inicial cuando el componente se monta
+  useEffect(() => {
+    if (initialMessage && initialMessage.trim() !== "") {
+      handleSendMessage(initialMessage);
+    }
+  }, []); // Se ejecuta solo una vez al montar el componente
+
+  const handleSendMessage = (messageToSend = inputMessage) => {
+    if (messageToSend.trim() === "") return;
 
     const newUserMessage: Message = {
       id: Date.now(),
-      text: inputMessage,
+      text: {
+        message: messageToSend,
+        action: "",
+        params: "",
+      },
       sender: "user",
     };
 
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
     setInputMessage("");
-
-    // Simular respuesta del servidor
-    handleAgentResponse(inputMessage);
+    handleAgentResponse(messageToSend);
   };
 
-  // Función actualizada para obtener respuesta desde la API
   const handleAgentResponse = async (userMessage: string) => {
-    // Eliminar cualquier mensaje de typing previo
     setMessages((prev) => prev.filter((msg) => !msg.isTyping));
 
     // Agregar indicador de typing
     const typingMessage: Message = {
       id: Date.now() + 2,
-      text: "",
+      text: {
+        message: "I'm thinking, please wait",
+        action: "",
+        params: "",
+      },
       sender: "agent",
       isTyping: true,
     };
     setMessages((prev) => [...prev, typingMessage]);
 
     try {
-      // Llamar a la API para obtener la respuesta
-      const agentResponse = await getAgentResponse(userMessage);
-      console.log(agentResponse);
+      console.log("User message:", userMessage);
+      console.log("Initial message:", initialMessage);
 
-      // Actualizar mensajes con la respuesta real de la API
-      setMessages((prev) => [
-        ...prev.filter((msg) => !msg.isTyping),
-        {
-          id: Date.now() + 3,
-          text: agentResponse.response || `I'm thinking, please wait"`,
-          sender: "agent",
-        },
-      ]);
+      // Verificar si es el mensaje inicial y manejarlo diferente
+      const isInitialMessageSending =
+        userMessage === initialMessage && messages.length <= 2;
+
+      if (isInitialMessageSending) {
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.isTyping),
+          {
+            id: Date.now() + 3,
+            text: {
+              message:
+                "The Canada Customs & Revenue Agency has 9 new invoices with a high confidence level of being duplicated",
+              action: "Review this Invoice Group",
+              params: "",
+            },
+            sender: "agent",
+          },
+        ]);
+      } else {
+        const agentResponse = await getAgentResponse(userMessage);
+        setMessages((prev) => [
+          ...prev.filter((msg) => !msg.isTyping),
+          {
+            id: Date.now() + 3,
+            text: {
+              message: agentResponse.response || "I'm thinking, please wait",
+              action: "",
+              params: "",
+            },
+            sender: "agent",
+          },
+        ]);
+      }
     } catch (error) {
-      // Manejar error en caso de fallo en la API
       console.error("Error getting agent response:", error);
       setMessages((prev) => [
         ...prev.filter((msg) => !msg.isTyping),
         {
           id: Date.now() + 3,
-          text: `Sorry, I couldn't process your request. Please try again later.`,
+          text: {
+            message:
+              "Sorry, I couldn't process your request. Please try again later.",
+            action: "Please try again later.",
+            params: "",
+          },
           sender: "agent",
         },
       ]);
     }
   };
 
-  const isFirstOpen = useRef(true);
   useEffect(() => {
-    if (isSheetOpen && isFirstOpen.current) {
-      const defaultMessage =
-        "How to define if an invoice is a `similar invoice`?";
-      const newUserMessage: Message = {
-        id: Date.now(),
-        text: defaultMessage,
-        sender: "user",
-      };
-
-      setMessages((prevMessages) => [...prevMessages, newUserMessage]);
-      handleAgentResponse(defaultMessage);
-      isFirstOpen.current = false;
-    } else {
-      messages = [];
+    if (isSheetOpen) {
+      
+      if (initialMessage && initialMessage.trim() !== "") {
+        setInputMessage(initialMessage);
+      }
+      setMessages([]);
     }
-  }, [isSheetOpen]);
+  }, [isSheetOpen]); // Se ejecuta cada vez que cambia isSheetOpen
+
+  const button: HTMLElement | null = document.querySelector(
+    ".floating-sofia-button"
+  );
+  function handleAnimationEnd(): void {
+    if (!button) return;
+    button.classList.remove("animate");
+    setTimeout((): void => {
+      button?.classList.add("animate");
+    }, 5000);
+  }
+
+  if (button) {
+    button.addEventListener("animationend", handleAnimationEnd);
+    if (isSheetOpen) {
+      button.classList.remove("animate");
+    }
+    setTimeout((): void => {
+      button.classList.add("animate");
+    }, 1000);
+  }
 
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-      <TolltipInfoHover
-        title="✨ Ask to OFIA ✨"
-        content="Learn more about this KPI"
-        action={null}
-      >
+      {type == "tooltip" ? (
+        <TolltipInfoHover
+          title="✨ Ask to OFIA ✨"
+          content="Learn more about this KPI"
+          action={null}
+        >
+          <SheetTrigger asChild>
+            <Button variant="ghost" className="cursor-pointer">
+              <picture className="floating-button-img-concept">
+                <source src={HeadChatbotOFIA} />
+                <img
+                  src={HeadChatbotOFIA}
+                  alt="ofia-chatbot-concept"
+                  width={30}
+                  height={30}
+                />
+              </picture>
+            </Button>
+          </SheetTrigger>
+        </TolltipInfoHover>
+      ) : type == "floating-button" ? (
+        <TolltipInfoHover title="✨ Ask to OFIA ✨" content="" action={null}>
+          <SheetTrigger asChild>
+            <Button
+              size="icon"
+              className="floating-sofia-button rounded-full h-12 w-12 shadow-lg p-1 bg-primary cursor-pointer"
+            >
+              <div className="ring-spacer h-full w-full rounded-full bg-zinc-50 flex justify-center items-center">
+                <picture className="floating-button-img-concept">
+                  <source src={HeadChatbotOFIA} />
+                  <img
+                    src={HeadChatbotOFIA}
+                    alt="ofia-chatbot-concept"
+                    width={50}
+                    height={50}
+                  />
+                </picture>
+              </div>
+            </Button>
+          </SheetTrigger>
+        </TolltipInfoHover>
+      ) : (
         <SheetTrigger asChild>
-          <Button variant="ghost" className="cursor-pointer">
-            <picture className="floating-button-img-concept">
-              <source src={HeadChatbotOFIA} />
-              <img
-                src={HeadChatbotOFIA}
-                alt="ofia-chatbot-concept"
-                width={30}
-                height={30}
-              />
-            </picture>
+          <Button variant="default" className="cursor-pointer">
+            ✨Review with SOFIA✨
           </Button>
         </SheetTrigger>
-      </TolltipInfoHover>
+      )}
 
       <SheetContent className="max-h-[95dvh] m-auto rounded-l-md border-l-2 border-t-2 border-b-2 border-amber-400">
         <SheetHeader>
@@ -220,9 +313,7 @@ const AssistentSheet = () => {
                           : "justify-start"
                       }`}
                     >
-                      <div
-                        className={`flex items-end space-x-2 max-w-[100%]`}
-                      >
+                      <div className={`flex items-end space-x-2 max-w-[100%]`}>
                         {message.sender === "agent" ? (
                           message.isTyping ? (
                             <TypingDots />
@@ -241,15 +332,22 @@ const AssistentSheet = () => {
                           <div></div>
                         )}
                         {!message.isTyping && (
-                          <p
+                          <div
                             className={`py-2 px-3 text-sm ${
                               message.sender === "user"
                                 ? "bg-amber-50 text-amber-950 border-amber-300 border rounded-l-xl rounded-tr-xl"
                                 : "bg-amber-50 text-amber-800 border-amber-300 border rounded-r-xl rounded-tl-xl"
                             }`}
                           >
-                            {message.text}
-                          </p>
+                            <p>{message.text.message}</p>
+                            {message.text.action && (
+                              <InvoiceDrawerDetails
+                              buttonTitle="Review Goup Invoice"
+                              group_uuid={message.text.params}
+                              type="button"
+                            />
+                            )}
+                          </div>
                         )}
                       </div>
                     </motion.div>
@@ -266,12 +364,15 @@ const AssistentSheet = () => {
               </Button>
               <Input
                 type="email"
-                placeholder="Ask Anything"
+                placeholder="Ask anything"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               />
-              <Button onClick={handleSendMessage}>
+              <Button
+                onClick={() => handleSendMessage()}
+                className="cursor-pointer"
+              >
                 <SendHorizontal />
               </Button>
             </div>
