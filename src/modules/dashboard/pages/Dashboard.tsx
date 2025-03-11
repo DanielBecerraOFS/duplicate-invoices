@@ -21,8 +21,8 @@ import {
 import { SonnerToastLog } from "@/modules/core/router";
 import axios from "axios";
 import { toast } from "sonner";
-
-// Define filter keys type for better type safety
+import Lottie from "lottie-react";
+import CircleLoadingAnimation from "@/assets/circle_progress_indicator.json"
 type FilterKeys = "reference" | "pattern" | "confidence" | "vendor" | "date";
 
 const Dashboard: React.FC = () => {
@@ -260,9 +260,9 @@ const Dashboard: React.FC = () => {
   // Loading state
   if (initialLoading)
     return (
-      <div className="dashboard-layout w-[100vw] h-full py-1 px-4 md:px-8 md:py-4 flex justify-center items-center">
-        <div className="app-wrapper flex flex-col justify-center items-center gap-4">
-          <CircleLoader />
+      <div className="dashboard-layout w-[100svw] h-[100svh] py-1 px-4 md:px-8 md:py-4 flex justify-center items-center">
+        <div className="app-wrapper flex flex-col justify-center items-center gap-4 w-full h-full">
+        <Lottie animationData={CircleLoadingAnimation} style={{ width: 150, height: 150 }} />
           <SonnerToastLog
             type="warning"
             title="Loading recent information"
