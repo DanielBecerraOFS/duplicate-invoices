@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { CloudUpload, SendHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import ChatBotBody from "@/assets/ofia-chatbot.png";
 import HeadChatbotOFIA from "@/assets/ofia-chatbot-head.png";
@@ -172,7 +173,6 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
 
   useEffect(() => {
     if (isSheetOpen) {
-      
       if (initialMessage && initialMessage.trim() !== "") {
         setInputMessage(initialMessage);
       }
@@ -254,10 +254,11 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
 
       <SheetContent className="max-h-[95dvh] m-auto rounded-l-md border-l-2 border-t-2 border-b-2 border-amber-400">
         <SheetHeader>
-          <SheetTitle className="text-center">✨ OFIA AGENT ✨</SheetTitle>
+          <SheetTitle className="text-center">✨ SOFIA AGENT ✨</SheetTitle>
         </SheetHeader>
-        <div className="py-4 px-6 sheet-body-content flex flex-col gap-3 h-full">
-          <div className="sheet-chat-container min-h-[90%]">
+
+        <div className="py-4 px-6 sheet-body-content flex flex-col gap-3 w-full h-full">
+          <ScrollArea className="h-[460px] w-[340px]">
             {messages.length == 0 ? (
               <div className="starter-chat-pack-container flex flex-col gap-4 items-center">
                 <picture className="chat-bot-agent-concept">
@@ -298,7 +299,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="flex-grow overflow-y-auto p-4 space-y-4">
+              <div className="flex-grow overflow-y-auto p-4 space-y-4 max-w-[350px]">
                 <AnimatePresence>
                   {messages.map((message) => (
                     <motion.div
@@ -342,10 +343,10 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                             <p>{message.text.message}</p>
                             {message.text.action && (
                               <InvoiceDrawerDetails
-                              buttonTitle="Review Goup Invoice"
-                              group_uuid={message.text.params}
-                              type="button"
-                            />
+                                buttonTitle="Review Goup Invoice"
+                                group_uuid={message.text.params}
+                                type="button"
+                              />
                             )}
                           </div>
                         )}
@@ -356,7 +357,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                 <div ref={messagesEndRef} />
               </div>
             )}
-          </div>
+          </ScrollArea>
           <div className="sheet-input-container">
             <div className="flex w-full max-w-sm items-center space-x-2">
               <Button variant="outline" type="submit">
