@@ -205,7 +205,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       {type == "tooltip" ? (
         <TolltipInfoHover
-          title="✨ Ask to OFIA ✨"
+          title="✨ Ask to SOFIA ✨"
           content="Learn more about this KPI"
           action={null}
         >

@@ -23,6 +23,10 @@
   animation: shadow-drop-center 1s cubic-bezier(0.860, 0.000, 0.070, 1.000) infinite alternate both;
 }
 
+.drawer-details-table::-webkit-scrollbar {
+  display: none;
+}
+
 @keyframes shadow-drop-center {
   0% {
     -webkit-box-shadow: 0 0 0 0 rgba(207, 0, 0, 0);

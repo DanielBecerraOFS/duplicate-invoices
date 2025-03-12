@@ -1,50 +1,94 @@
-# React + TypeScript + Vite
+## Duplicate Invoices Checker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+The application identifies duplicate invoices within the Accounts Payable process by grouping suspected duplicates based on various patterns. Users can review these potential duplicates with the assistance of a machine learning-based confidence score, provide feedback, and take appropriate action to prevent unnecessary payments and streamline invoice processing.
 
-Currently, two official plugins are available:
+## V1.5A stable version
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Introduce ✨SOFIA Agent✨**: A concept to integrate LLM model to help on demand. 
+- **Duplicate Detection**: Uses specific algorithms to identify duplicate invoices based on defined criteria.
+- **User-Friendly Interface**: Provides an intuitive UI for users to view and manage detected duplicates.
 
-## Expanding the ESLint configuration
+## Technologies Used
+* **React**: For building the user interface.
+* **TypeScript**: For static typing.
+* **Vite**: For fast development server and build tool.
+* **Tailwind CSS**: For styling the application.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Project structure 
 ```
+duplicate-invoices-app/
+├── public/                         # Static assets
+├── src/                            # Source code
+│   ├── components/                 # Global components
+│   │   ├── ui/                     # Schadcn components
+│   ├── assets/                     # Images and other assets
+│   │   ├── modules/                # Specific Context components
+│   │   │    ├── dashboard/ 
+│   │   │    │    ├── components/   
+│   │   │    │    ├── layout/       
+│   │   │    │    ├── pages/
+│   │   │    │    ├── services/
+│   │   │    │    ├── utils/
+│   │   │    │    ├── router.tsx    # Exports dashboard routes
+│   │   │    ├── core/
+│   │   │    │    ├── components/
+│   │   │    │    ├── layout/
+│   │   │    │    ├── pages/
+│   │   │    │    ├── services/
+│   │   │    │    ├── utils/
+│   │   │    │    ├── router.tsx    # Exports core routes
+│   │   │    ├── sofia/
+│   │   │    │    ├── components/
+│   │   │    │    ├── services/
+│   │   │    │    ├── utils/
+│   │   │    │    ├── router.tsx    # Exports core routes
+│   ├── App.tsx                     # Main App component
+│   ├── main.tsx                    # Entry point
+│   └── index.css                   # Project root vars styles
+│   └── App.css                     # Main styles
+├── index.html                      # Project metadata and dependencies
+├── package.json                    # Project metadata and dependencies
+├── tsconfig.json                   # TypeScript configuration
+├── tailwind.config                 # Tailwind configuration
+├── components.json                 # Schadcn configuration
+├── vite.config.ts                  # Vite configuration
+└── README.md                       # Project documentation
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
-
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
 ```
+## Getting Started
+
+### Prerequisites
+
+- Node.js (version 14 or higher)
+- npm or yarn package manager
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/DanielBecerraOFS/duplicate-invoices.git
+   cd duplicate-invoices
+   ```` 
+
+2. **Install Dependencies**:
+
+   Using npm:
+   ```bash
+   npm install
+   ```` 
+   Or using yarn:
+   ```bash
+   yarn install
+   ```` 
+3. **Running the Application**: 
+   Using npm:
+   ```bash
+   npm run dev
+   ```` 
+   Or using yarn:
+   ```bash
+   yarn dev
+   ```` 
+
+The application will be accessible at http://localhost:5173.

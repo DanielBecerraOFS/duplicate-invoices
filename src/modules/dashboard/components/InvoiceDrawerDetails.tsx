@@ -20,6 +20,8 @@ import {
   getInvoices,
   InvoiceResponse,
 } from "@/modules/dashboard/services/apiService";
+import Lottie from "lottie-react";
+import CircleLoadingAnimation from "@/assets/circle_progress_indicator.json";
 
 interface InvoiceDrawerProps {
   buttonTitle: string;
@@ -55,8 +57,13 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
   const renderCardDetails = () => {
     if (loading) {
       return (
-        <div className="w-full flex justify-center items-center py-4">
-          <CircleLoader color="#3B82F6" />
+        <div className="dashboard-layout w-[100svw] h-[100svh] py-1 px-4 md:px-8 md:py-4 flex justify-center items-center">
+          <div className="app-wrapper flex flex-col justify-center items-center gap-4 w-full h-full">
+            <Lottie
+              animationData={CircleLoadingAnimation}
+              style={{ width: 150, height: 150 }}
+            />
+          </div>
         </div>
       );
     }
