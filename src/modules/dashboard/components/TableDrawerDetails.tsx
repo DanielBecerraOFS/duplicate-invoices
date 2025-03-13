@@ -20,7 +20,7 @@ const TableDrawerDetails: React.FC<TableDrawerDetailsProps> = ({
   invoices_group,
 }) => {
   return (
-    <ScrollArea className="h-72 w-full">
+    <ScrollArea className="h-96 w-full">
       <Table className="drawer-details-table">
         <TableHeader>
           <TableRow>
@@ -42,7 +42,7 @@ const TableDrawerDetails: React.FC<TableDrawerDetailsProps> = ({
         <TableBody>
           {invoices_group.map((invoice, index) => (
             <TableRow
-              className={`${index == 0 ? "bg-amber-100 text-amber-950" : ""}`}
+              className={`${index == 0 ? "bg-primary-container text-on-primary-container" : "cursor-pointer hover:bg-surface-container-low"} `}
             >
               <TableCell>
                 <Checkbox

@@ -1,80 +1,128 @@
+import { z } from "zod"
+import axios from "axios";
+import { toast } from "sonner";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { CircleLoader } from "react-spinners";
 import { Button } from "@/components/ui/button";
 import {
   TabsTable,
   KPICard,
   PaginationTable,
   SelectTableFilter,
-  RecommendsCarrousel,
+  useDebounce,
+  DataTablePagination, 
+  DataTable, 
+  TableColumns,
+  FormatInvoiceDate,
+  FormatValues
 } from "@/modules/dashboard/router";
+import { CircleLoader, SonnerToastLog } from "@/modules/core/router";
 import {
   getKPIs,
   KPI,
   Invoice,
   getInvoices,
   InvoicesMetadata,
+  GroupedInvoices,
   getInvoicesMetadata,
   getAgentAlerts,
   AgentAlerts,
 } from "@/modules/dashboard/services/apiService";
-import { SonnerToastLog } from "@/modules/core/router";
-import axios from "axios";
-import { toast } from "sonner";
-import Lottie from "lottie-react";
-import CircleLoadingAnimation from "@/assets/circle_progress_indicator.json"
+
+import { groupedInvoiceSchema } from "@/modules/dashboard/utils/data/label-schema-table"
+import tasksData from '@/modules/dashboard/utils/data/sample-task-data.json';
+
+// Improved type definitions
 type FilterKeys = "reference" | "pattern" | "confidence" | "vendor" | "date";
+type FilterState = Record<FilterKeys, string>;
+type LoadingState = {
+  initial: boolean;
+  invoices: boolean;
+  metadata: boolean;
+  alerts: boolean;
+};
+
+function groupedByUUID(invoices: Invoice[]): GroupedInvoices {
+    const result: GroupedInvoices = {};
+    invoices.forEach((invoice) => {
+      const groupKey = invoice.group_id;
+      if (!result[groupKey]) {
+        result[groupKey] = {
+          items: [],
+          region: "",
+          pattern: "",
+          open: "",
+          date: "",
+          confidence: "",
+          amount_overpaid: "",
+        };
+      }
+      result[groupKey].items.push(invoice);
+      result[groupKey].confidence = invoice.confidence;
+      result[groupKey].region = invoice.region;
+      result[groupKey].open = invoice.open === true ? "Open" : "Close";
+      result[groupKey].date = FormatInvoiceDate(invoice.date);
+      result[groupKey].pattern = invoice.pattern;
+    });
+    Object.keys(result).forEach((groupKey) => {
+      const group = result[groupKey];
+      if (group.items.length > 1) {
+        const group_total_value = group.items
+          .map((item) => item.value)
+          .reduce((sum, item) => sum + item, 0);
+        group.amount_overpaid = FormatValues(group_total_value);
+      }
+    });
+    return result;
+  }
 
 const Dashboard: React.FC = () => {
-  // Initial state with type safety
+  // Consolidated state with more specific types
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [kpiData, setKpiData] = useState<KPI | null>(null);
-  const [metadata, setInvoicesMetadata] = useState<InvoicesMetadata>();
-  const [alerts, setAgentAlerts] = useState<AgentAlerts>();
-  const [initialLoading, setInitialLoading] = useState<boolean>(true);
-  const [paginationLoading, setPaginationLoading] = useState<boolean>(false);
-  const [filters, setCurrentFilters] = useState<Record<string, string>>({});
+  const [metadata, setInvoicesMetadata] = useState<InvoicesMetadata | null>(null);
+  const [alerts, setAgentAlerts] = useState<AgentAlerts | null>(null);
+  
+  // Consolidated loading states
+  const [loading, setLoading] = useState<LoadingState>({
+    initial: true,
+    invoices: false,
+    metadata: false,
+    alerts: false,
+  });
 
-  // Improved filter values initialization
-  const [filterValues, setFilterValues] = useState<Record<FilterKeys, string>>({
+  // Improved filter state
+  const [filterValues, setFilterValues] = useState<FilterState>({
     reference: "",
     pattern: "",
     confidence: "",
     vendor: "",
     date: "",
   });
+  
+  // Active filters that are actually applied
+  const [activeFilters, setActiveFilters] = useState<Record<string, string>>({});
+  
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    currentPage: 1,
+    totalPages: 1,
+    itemsPerPage: 10,
+  });
 
-  // Pagination state with improved typing
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [totalPages, setTotalPages] = useState<number>(1);
-  const itemsPerPage = 10;
+  // Debounce filter changes to prevent excessive API calls
+  const debouncedFilters = useDebounce(activeFilters, 300);
 
-  // Memoized unique filter options to prevent unnecessary re-renders
-  const filterOptions = useMemo(
-    () => ({
-      reference: [...new Set(invoices.map((invoice) => invoice.reference))],
-      pattern: [...new Set(invoices.map((invoice) => invoice.pattern))],
-      confidence: ["High", "Medium", "Low"],
-      date: [...new Set(invoices.map((invoice) => invoice.date))],
-      vendor: [...new Set(invoices.map((invoice) => invoice.vendor))],
-    }),
-    [invoices]
-  );
+  // Memoized unique filter options using only what's needed
+  const confidenceOptions = useMemo(() => ["High", "Medium", "Low"], []);
 
-  // Improved select change handler with type safety
-  const handleSelectChange = useCallback(
-    (fieldName: FilterKeys, value: string) => {
-      setFilterValues((prev) => ({
-        ...prev,
-        [fieldName]: value,
-      }));
-    },
-    []
-  );
+  // Optimized select change handler
+  const handleSelectChange = useCallback((fieldName: FilterKeys, value: string) => {
+    setFilterValues(prev => ({ ...prev, [fieldName]: value }));
+  }, []);
 
-  // Optimized filter application logic
+  // Apply filters more efficiently
   const applyFilters = useCallback(() => {
-    const activeFilters = Object.entries(filterValues).reduce(
+    const newFilters = Object.entries(filterValues).reduce(
       (acc, [key, value]) => {
         if (value) {
           acc[key] = value;
@@ -84,185 +132,185 @@ const Dashboard: React.FC = () => {
       {} as Record<string, string>
     );
 
-    // Reset to first page and trigger loading only if filters changed
-    setCurrentFilters(activeFilters);
-    setCurrentPage(1);
-    setPaginationLoading(true);
+    setActiveFilters(newFilters);
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   }, [filterValues]);
 
-  // Clear all filters with a single function
+  // Clear filters more efficiently
   const clearFilters = useCallback(() => {
-    setFilterValues({
+    const emptyFilters: FilterState = {
       reference: "",
       pattern: "",
       confidence: "",
       vendor: "",
       date: "",
-    });
-    setCurrentFilters({});
-    setCurrentPage(1);
-    setPaginationLoading(true);
+    };
+    
+    setFilterValues(emptyFilters);
+    setActiveFilters({});
+    setPagination(prev => ({ ...prev, currentPage: 1 }));
   }, []);
 
-  // Memoized fetch invoices function to prevent unnecessary re-renders
-  const fetchInvoices = useCallback(async (): Promise<void> => {
-    if (initialLoading) return;
-
-    setPaginationLoading(true);
-    try {
-      const params = {
-        ...filters,
-        page: currentPage,
-      };
-
-      const response = await getInvoices(params);
-      setInvoices(response.results);
-      setTotalPages(Math.ceil(response.count / itemsPerPage) || 1);
-    } catch (error) {
-      console.error("Error al cargar facturas:", error);
-    } finally {
-      setPaginationLoading(false);
-    }
-  }, [currentPage, filters, initialLoading, itemsPerPage]);
-
-  const fetchInvoicesMetadata = useCallback(async (): Promise<void> => {
-    if (initialLoading) return;
-
-    setPaginationLoading(true);
-    try {
-      const filters = await getInvoicesMetadata();
-      setInvoicesMetadata(filters);
-    } catch (error) {
-      console.error("Error al cargar facturas:", error);
-    } finally {
-      setPaginationLoading(false);
-    }
-  }, []);
-
-  const fetchAgentAlerts = useCallback(async (): Promise<void> => {
-    if (initialLoading) return;
-    try {
-      const alerts = await getAgentAlerts();
-      setAgentAlerts(alerts);
-    } catch (error) {
-      console.error("Error al cargar facturas:", error);
-    } finally {
-      setPaginationLoading(false);
-    }
-  }, []);
-
-  // Initial data load
+  // Fetch all initial data in one useEffect
   useEffect(() => {
     const initialLoad = async () => {
-      setInitialLoading(true);
+      setLoading(prev => ({ ...prev, initial: true }));
+      
       try {
-        const kpiData = await getKPIs();
-        setKpiData(kpiData);
+        // Parallel data fetching for initial load
+        const [kpiResponse, alertsResponse, invoiceResponse, metadataResponse] = await Promise.all([
+          getKPIs(),
+          getAgentAlerts(),
+          getInvoices({ page: 1 }),
+          getInvoicesMetadata()
+        ]);
 
-        const alerts = await getAgentAlerts();
-        console.log(alerts);
-        setAgentAlerts(alerts);
-
-        const response = await getInvoices({
-          page: 1,
-        });
-        setInvoices(response.results);
-        setTotalPages(Math.ceil(response.count / itemsPerPage) || 1);
-
-        const filters = await getInvoicesMetadata();
-        setInvoicesMetadata(filters);
+        setKpiData(kpiResponse);
+        setAgentAlerts(alertsResponse);        
+        setInvoices(invoiceResponse.results);
+        setPagination(prev => ({
+          ...prev,
+          totalPages: Math.ceil(invoiceResponse.count / pagination.itemsPerPage) || 1
+        }));
+        setInvoicesMetadata(metadataResponse);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-            switch (error.response.status) {
-              case 404:
-                toast.error("An Error found trying to retrieve information", {
-                  description:
-                    "It's look like a problem with the GET Protocol ",
-                  action: {
-                    label: "Try again",
-                    onClick: () => console.log("Undo"),
-                  },
-                });
-                break;
-              case 500:
-                toast.error("An Error found with the server", {
-                  description:
-                    "It's look like a problem about server communication",
-                  action: {
-                    label: "Try again",
-                    onClick: () => console.log("Undo"),
-                  },
-                });
-                break;
-              default:
-                toast.error("An Error found to load information", {
-                  description: "It's look like a runtime problem",
-                  action: {
-                    label: "Try again",
-                    onClick: () => console.log("Undo"),
-                  },
-                });
-            }
-          } else if (error.request) {
-            toast.error("An Error found with yout internet conection", {
-              description: "Check your WiFi conection",
-              action: {
-                label: "Try again",
-                onClick: () => console.log("Undo"),
-              },
-            });
-          } else {
-            toast.error("An Error found with the request", {
-              description:
-                "We are collecting error information. Please try again later",
-              action: {
-                label: "Ok",
-                onClick: () => console.log("Undo"),
-              },
-            });
-          }
-        }
+        handleApiError(error);
       } finally {
-        setInitialLoading(false);
+        setLoading(prev => ({ ...prev, initial: false }));
       }
     };
 
     initialLoad();
+    return () => {
+      // Cancel any pending API requests if needed
+    };
+  }, [pagination.itemsPerPage]);
+
+  // Centralized error handling
+  const handleApiError = useCallback((error: unknown) => {
+    if (axios.isAxiosError(error)) {
+      if (error.response) {
+        const status = error.response.status;
+        let title = "An error occurred";
+        let description = "Please try again later";
+        
+        if (status === 404) {
+          title = "Resource not found";
+          description = "The requested information could not be found";
+        } else if (status === 500) {
+          title = "Server error";
+          description = "There was a problem with the server";
+        }
+        
+        toast.error(title, {
+          description,
+          action: {
+            label: "Retry",
+            onClick: () => {
+              // Actually retry the failed operation instead of just logging
+              if (!loading.initial) {
+                refreshData();
+              }
+            },
+          },
+        });
+      } else if (error.request) {
+        toast.error("Network error", {
+          description: "Please check your internet connection",
+          action: {
+            label: "Retry",
+            onClick: () => {
+              if (!loading.initial) {
+                refreshData();
+              }
+            },
+          },
+        });
+      }
+    } else {
+      toast.error("An unexpected error occurred", {
+        description: "We're looking into this issue",
+      });
+    }
+  }, [loading.initial]);
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      if (loading.initial) return;
+      
+      setLoading(prev => ({ ...prev, invoices: true }));
+      
+      try {
+        const params = {
+          ...debouncedFilters,
+          page: pagination.currentPage,
+        };
+
+        const response = await getInvoices(params);
+        setInvoices(response.results);
+       
+        setPagination(prev => ({
+          ...prev,
+          totalPages: Math.ceil(response.count / pagination.itemsPerPage) || 1
+        }));
+      } catch (error) {
+        handleApiError(error);
+      } finally {
+        setLoading(prev => ({ ...prev, invoices: false }));
+      }
+    };
+
+    fetchInvoices();
+  }, [debouncedFilters, pagination.currentPage, pagination.itemsPerPage, loading.initial, handleApiError]);
+
+  const refreshData = useCallback(async () => {
+    if (loading.initial) return;
+    
+    setLoading(prev => ({ 
+      ...prev, 
+      invoices: true,
+      metadata: true,
+      alerts: true 
+    }));
+    
+    try {
+      const [alertsResponse, invoiceResponse, metadataResponse] = await Promise.all([
+        getAgentAlerts(),
+        getInvoices({ 
+          ...debouncedFilters,
+          page: pagination.currentPage 
+        }),
+        getInvoicesMetadata()
+      ]);
+
+      setAgentAlerts(alertsResponse);
+      setInvoices(invoiceResponse.results);
+      setPagination(prev => ({
+        ...prev,
+        totalPages: Math.ceil(invoiceResponse.count / pagination.itemsPerPage) || 1
+      }));
+      setInvoicesMetadata(metadataResponse);
+    } catch (error) {
+      handleApiError(error);
+    } finally {
+      setLoading(prev => ({ 
+        ...prev, 
+        invoices: false,
+        metadata: false,
+        alerts: false 
+      }));
+    }
+  }, [debouncedFilters, pagination.currentPage, pagination.itemsPerPage, loading.initial, handleApiError]);
+
+  const handlePageChange = useCallback((page: number) => {
+    setPagination(prev => ({ ...prev, currentPage: page }));
   }, []);
 
-  // Trigger invoice fetch when filters or page changes
-  useEffect(() => {
-    // Only fetch if not in initial loading state
-    if (!initialLoading) {
-      fetchInvoices();
-    }
-  }, [
-    filters,
-    currentPage,
-    fetchInvoices,
-    initialLoading,
-    metadata,
-    fetchInvoicesMetadata,
-  ]);
-  useEffect(() => {
-    if (!initialLoading) {
-      fetchInvoicesMetadata();
-    }
-  }, [filters, fetchInvoicesMetadata, initialLoading]);
-
-  useEffect(() => {
-    if (!initialLoading) {
-      fetchAgentAlerts();
-    }
-  }, [alerts, fetchAgentAlerts, initialLoading]);
-
-  // Loading state
-  if (initialLoading)
+  if (loading.initial) {
     return (
       <div className="dashboard-layout w-[100svw] h-[100svh] py-1 px-4 md:px-8 md:py-4 flex justify-center items-center">
         <div className="app-wrapper flex flex-col justify-center items-center gap-4 w-full h-full">
-        <Lottie animationData={CircleLoadingAnimation} style={{ width: 150, height: 150 }} />
+          <CircleLoader width={150} height={150}/>
           <SonnerToastLog
             type="warning"
             title="Loading recent information"
@@ -272,11 +320,10 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
     );
+  }
+
   return (
     <div className="grid-content">
-      <div className="recommends-on-start-container my-3">
-        {alerts && <RecommendsCarrousel alerts={alerts} />}
-      </div>
       <div className="kpi-grid-content">
         <div className="flex flex-row justify-between gap-2 flex-wrap">
           {kpiData &&
@@ -299,94 +346,22 @@ const Dashboard: React.FC = () => {
                   )}
                 data={Number(value)}
                 isCurrency={
-                  key == "total_open_similar_invoices" ||
-                  key == "total_value_of_similar_invoices"
-                    ? true
-                    : false
+                  key === "total_open_similar_invoices" ||
+                  key === "total_value_of_similar_invoices"
                 }
                 legend="+20.1% from last month"
               />
             ))}
         </div>
       </div>
-      <div className="filter-container mb-4">
-        <div className="filter-wrapper py-1 hidden md:block">
-          <h3 className="font-medium mb-4">Filters</h3>
-          <div className="filter-items-grid flex flex-row gap-2">
-            {metadata && (
-              <div className="flex flex-row gap-2">
-                <SelectTableFilter
-                  placeholder="By Reference"
-                  label="Reference"
-                  options={metadata.reference_values}
-                  value={filterValues.reference}
-                  onChange={(value) => handleSelectChange("reference", value)}
-                />
-                <SelectTableFilter
-                  placeholder="BY Pattern"
-                  label="Pattern"
-                  options={metadata.pattern_values}
-                  value={filterValues.pattern}
-                  onChange={(value) => handleSelectChange("pattern", value)}
-                />
-                <SelectTableFilter
-                  placeholder="By Confidence"
-                  label="Confidence Level"
-                  options={filterOptions.confidence}
-                  value={filterValues.confidence}
-                  onChange={(value) => handleSelectChange("confidence", value)}
-                />
-                <SelectTableFilter
-                  placeholder="By Vendor"
-                  label="Vendor Name"
-                  options={metadata.vendor_values}
-                  value={filterValues.vendor}
-                  onChange={(value) => handleSelectChange("vendor", value)}
-                />
-                <SelectTableFilter
-                  placeholder="By Date"
-                  label="Dates"
-                  options={metadata.date_values}
-                  value={filterValues.date}
-                  onChange={(value) => handleSelectChange("date", value)}
-                />
-              </div>
-            )}
-            <div className="flex gap-2">
-              <Button
-                variant="default"
-                className="cursor-pointer"
-                onClick={applyFilters}
-              >
-                Aplicar
-              </Button>
-              <Button
-                variant="outline"
-                className="cursor-pointer"
-                onClick={clearFilters}
-              >
-                Limpiar
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="relative">
-        {paginationLoading && (
+        {loading.invoices && (
           <div className="absolute inset-0 bg-white/50 flex justify-center items-center z-10">
-            <CircleLoader />
+            <CircleLoader width={60} height={60} />
           </div>
         )}
-        <TabsTable data_invoices={invoices} />
       </div>
-      <PaginationTable
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={(page) => {
-          setCurrentPage(page);
-          setPaginationLoading(true);
-        }}
-      />
+    <DataTable data={[]} groupedData={groupedByUUID(invoices)}  columns={TableColumns}/> 
     </div>
   );
 };

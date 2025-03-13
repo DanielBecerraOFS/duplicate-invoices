@@ -1,189 +1,189 @@
+@import url('https://fonts.googleapis.com/css2?family=Pathway+Gothic+One&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
-@plugin "tailwindcss-animate";
-
-@custom-variant dark (&:is(.dark *));
-
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+
   line-height: 1.5;
   font-weight: 400;
-
   color-scheme: light dark;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.141 0.005 285.823);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.141 0.005 285.823);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.967 0.001 286.375);
-  --secondary-foreground: oklch(0.21 0.006 285.885);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  --accent: oklch(0.967 0.001 286.375);
-  --accent-foreground: oklch(0.21 0.006 285.885);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.577 0.245 27.325);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.871 0.006 286.286);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
+
+  --font-text: "Poppins", sans-serif;
+  --font-title: "Pathway Gothic One", sans-serif;
+
+  --primary: rgb(122 89 12); /* Se usa para elementos clave de la interfaz, como botones de acción principal y resaltados. */
+  --on-primary: rgb(255 255 255);/* Se usa para el texto o iconos que se colocan sobre el color primario, asegurando contraste suficiente. */
+  --primary-container: rgb(255 222 167); /* Se usa para resaltar elementos en tarjetas o fondos diferenciados sin ser tan dominante como el color primario. */
+  --on-primary-container: rgb(39 25 0); /* Se usa para garantizar buena legibilidad en fondos de color primario-container. */
+  --secondary: rgb(0 107 94); /* Complementa el primario, se usa en elementos secundarios como botones menos prominentes o etiquetas. */
+  --on-secondary: rgb(255 255 255); /* Se usa para los elementos colocados sobre el color secundario, como texto o iconos. */
+  --secondary-container: rgb(159 242 226); /* Se usa para resaltar información secundaria en tarjetas o fondos diferenciados. */
+  --on-secondary-container: rgb(0 32 27); /* Se usa para garantizar contraste adecuado en fondos secundarios. */
+  --tertiary: rgb(144 74 69); /* Se usa para detalles decorativos o distintivos que no son ni primarios ni secundarios. */
+  --on-tertiary: rgb(255 255 255); /* Asegura legibilidad en elementos con fondo terciario. */
+  --tertiary-container: rgb(255 218 214); /* Se usa para resaltar elementos terciarios sin ser muy dominante. */
+  --on-tertiary-container: rgb(59 9 8); /* Contraste adecuado en fondos terciarios. */
+  --error: rgb(186 26 26); /* Se usa para indicar estados de error, advertencias críticas y validaciones fallidas. */
+  --on-error: rgb(255 255 255); /* Asegura que la información de error sea legible. */
+  --error-container: rgb(255 218 214); /* Alternativa menos agresiva para mostrar errores en fondos diferenciados. */
+  --on-error-container: rgb(65 0 2); /* Contraste adecuado en fondos de error. */
+  --background: rgb(255 248 243); /* Usado para la superficie principal de la aplicación, generalmente el fondo base. */
+  --on-background: rgb(32 27 19);/* Se usa para el contenido principal que se muestra sobre el fondo. */
+  --surface: rgb(255 248 241); /* Se usa para tarjetas, diálogos y otras superficies elevadas. */
+  --on-surface: rgb(31 27 19); /* Se usa para asegurar legibilidad sobre los fondos de superficie. */
+  --surface-variant: #eee1cf; /* Se usa para diferenciación sutil de distintas secciones de la interfaz. */
+  --on-surface-variant: rgb(78 70 57); /* Asegura contraste suficiente en superficies variantes. */
+  --outline: rgb(128 118 103); /* Se usa para los contornos de elementos como tarjetas, botones y divisores. */
+  --outline-variant: rgb(209 197 180); /* Se usa para bordes menos prominentes o sutiles. */
+  --shadow: rgb(0 0 0); /* Se usa en elevaciones para dar profundidad a los elementos. */
+  --scrim: rgb(0 0 0); /* Se usa para superposiciones oscuras en diálogos, menús y efectos de desenfoque. */
+  --inverse-surface: rgb(52 48 39); /* Se usa para elementos oscuros en temas claros. */
+  --inverse-on-surface: rgb(249 240 226); /* Garantiza contraste suficiente en fondos inversos. */
+  --inverse-primary: rgb(237 192 108); /* Se usa para destacar el color primario en temas oscuros. */
+  
+  
+  /* Variantes de superficie para diferentes niveles de elevación: Se usan para jerarquizar la UI. */
+  --surface: rgb(255 248 241); /* Color de superficie base: Fondo principal de la interfaz. Se usa en tarjetas, diálogos y componentes generales. */
+  --surface-variant: rgb(238 225 207); /* Variante de superficie: Se usa para diferenciar secciones dentro de una misma pantalla sin un contraste fuerte. */
+  --inverse-surface: rgb(52 48 39); /* Superficie inversa: Se usa en temas oscuros o cuando se quiere contrastar con elementos más claros. */
+  --surface-dim: rgb(225 217 204); /* Superficie tenue: Alternativa más oscura del color surface, utilizada en interfaces de bajo contraste o modo oscuro. */
+  --surface-bright: rgb(255 248 241); /* Superficie brillante: Variante más clara de surface, usada en encabezados o áreas que requieren más luminosidad. */
+  --surface-container-lowest: rgb(255 255 255); /* Superficie de contenedor más baja: Representa el fondo más plano sin elevación. Se usa en el fondo general de la aplicación. */
+  --surface-container-low: rgb(252 242 229); /* Superficie de contenedor baja: Se usa en elementos ligeramente elevados sobre el fondo, como tarjetas sin sombra. */
+  --surface-container: rgb(246 237 223); /* Superficie de contenedor estándar: Se usa en tarjetas con sombra ligera y elementos de interfaz con algo de elevación. */
+  --surface-container-high: rgb(240 231 217); /* Superficie de contenedor alta: Para elementos más elevados en la jerarquía visual, como menús desplegables y cuadros de diálogo. */
+  --surface-container-highest: rgb(234 225 212); /* Superficie de contenedor más alta: Se usa en los elementos flotantes de mayor importancia, como tooltips y pop-ups. */
+    
   --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-primary: oklch(0.21 0.006 285.885);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.871 0.006 286.286);
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.141 0.005 285.823);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.141 0.005 285.823);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.985 0 0);
-  --primary-foreground: oklch(0.21 0.006 285.885);
-  --secondary: oklch(0.274 0.006 286.033);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.396 0.141 25.723);
-  --destructive-foreground: oklch(0.637 0.237 25.331);
-  --border: oklch(0.274 0.006 286.033);
-  --input: oklch(0.274 0.006 286.033);
-  --ring: oklch(0.442 0.017 285.786);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(0.274 0.006 286.033);
-  --sidebar-ring: oklch(0.442 0.017 285.786);
-}
 
+  --primary: rgb(237 192 108); /* Color primario: Se usa para elementos clave de la interfaz, como botones de acción principal y resaltados. */
+  --on-primary: rgb(65 45 0); /* Se usa para el texto o iconos sobre el color primario, asegurando contraste suficiente. */
+  --primary-container: rgb(94 66 0); /* Se usa para resaltar elementos en tarjetas o fondos diferenciados sin ser tan dominante como el color primario. */
+  --on-primary-container: rgb(255 222 167); /* Se usa para garantizar buena legibilidad en fondos de color primario-container. */
+  --secondary: rgb(131 213 198); /* Color secundario: Complementa el primario, se usa en botones secundarios o etiquetas. */
+  --on-secondary: rgb(0 55 48); /* Se usa para los elementos colocados sobre el color secundario, como texto o iconos. */
+  --secondary-container: rgb(0 80 71); /* Se usa para resaltar información secundaria en tarjetas o fondos diferenciados. */
+  --on-secondary-container: rgb(159 242 226); /* Se usa para garantizar contraste adecuado en fondos secundarios. */
+  
+  
+  --tertiary: rgb(255 179 172); /* Color terciario: Se usa para detalles decorativos o distintivos. */
+  --on-tertiary: rgb(87 30 26); /* Asegura legibilidad en elementos con fondo terciario. */
+  --tertiary-container: rgb(115 51 47); /* Se usa para resaltar elementos terciarios sin ser muy dominante. */
+  --on-tertiary-container: rgb(255 218 214); /* Contraste adecuado en fondos terciarios. */
+  
+  
+  --error: rgb(255 180 171); /* Color de error: Se usa para indicar estados de error, advertencias críticas y validaciones fallidas. */
+  --on-error: rgb(105 0 5); /* Asegura que la información de error sea legible. */
+  --error-container: rgb(147 0 10); /* Alternativa menos agresiva para mostrar errores en fondos diferenciados. */
+  --on-error-container: rgb(255 218 214); /* Contraste adecuado en fondos de error. */
+  
+  
+  --background: rgb(23 19 11); /* Color de fondo principal de la aplicación. */
+  --on-background: rgb(236 225 212); /* Se usa para el contenido principal que se muestra sobre el fondo. */
+  
+  --surface: rgb(22 19 11); /* Color de superficie base: Se usa en tarjetas, diálogos y otras superficies elevadas. */
+  --on-surface: rgb(234 225 212); /* Se usa para asegurar legibilidad sobre los fondos de superficie. */
+  --surface-variant: rgb(78 70 57); /* Se usa para diferenciar secciones dentro de una misma pantalla sin un contraste fuerte. */
+  --on-surface-variant: rgb(209 197 180); /* Asegura contraste suficiente en superficies variantes. */
+  
+  --outline: rgb(154 143 128); /* Se usa para los contornos de elementos como tarjetas, botones y divisores. */
+  --outline-variant: rgb(78 70 57); /* Se usa para bordes menos prominentes o sutiles. */
+  
+  
+  --shadow: rgb(0 0 0); /* Se usa en elevaciones para dar profundidad a los elementos. */
+  --scrim: rgb(0 0 0); /* Se usa para superposiciones oscuras en diálogos, menús y efectos de desenfoque. */
+  
+  
+  --inverse-surface: rgb(234 225 212); /* Superficie inversa: Se usa para elementos oscuros en temas claros. */
+  --inverse-on-surface: rgb(52 48 39); /* Garantiza contraste suficiente en fondos inversos. */
+  --inverse-primary: rgb(122 89 12); /* Se usa para destacar el color primario en temas oscuros. */
+  
+  /* Variantes fijadas de los colores primarios, secundarios y terciarios: Se usan en componentes de alto énfasis como botones de acción. */
+  --primary-fixed: rgb(255 222 167);
+  --on-primary-fixed: rgb(39 25 0);
+  --primary-fixed-dim: rgb(237 192 108);
+  --on-primary-fixed-variant: rgb(94 66 0);
+  --secondary-fixed: rgb(159 242 226);
+  --on-secondary-fixed: rgb(0 32 27);
+  --secondary-fixed-dim: rgb(131 213 198);
+  --on-secondary-fixed-variant: rgb(0 80 71);
+  --tertiary-fixed: rgb(255 218 214);
+  --on-tertiary-fixed: rgb(59 9 8);
+  --tertiary-fixed-dim: rgb(255 179 172);
+  --on-tertiary-fixed-variant: rgb(115 51 47);
+  
+  /* Variantes de superficie para diferentes niveles de elevación: Se usan para jerarquizar la UI. */
+  --surface-dim: rgb(22 19 11); /* Superficie tenue: Alternativa más oscura del color surface, utilizada en interfaces de bajo contraste o modo oscuro. */
+  --surface-bright: rgb(61 57 47); /* Superficie brillante: Variante más clara de surface, usada en encabezados o áreas que requieren más luminosidad. */
+  --surface-container-lowest: rgb(17 14 7); /* Superficie de contenedor más baja: Representa el fondo más plano sin elevación. Se usa en el fondo general de la aplicación. */
+  --surface-container-low: rgb(31 27 19); /* Superficie de contenedor baja: Se usa en elementos ligeramente elevados sobre el fondo, como tarjetas sin sombra. */
+  --surface-container: rgb(35 31 23); /* Superficie de contenedor estándar: Se usa en tarjetas con sombra ligera y elementos de interfaz con algo de elevación. */
+  --surface-container-high: rgb(46 42 33); /* Superficie de contenedor alta: Para elementos más elevados en la jerarquía visual, como menús desplegables y cuadros de diálogo. */
+  --surface-container-highest: rgb(57 52 43); /* Superficie de contenedor más alta: Se usa en los elementos flotantes de mayor importancia, como tooltips y pop-ups. */
+  
+}
+  
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
+  --color-on-primary: var(--on-primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
   --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-on-secondary: var(--on-secondary);
+  --color-secondary-container: var(--secondary-container);
+  --color-on-secondary-container: var(--on-secondary-container);
+  --color-tertiary:var(--on-tertiary);
+  --color-on-tertiary: var(--on-tertiary);
+  --color-tertiary-container: var(--tertiary-container);
+  --color-on-tertiary-container: var(--on-tertiary-container);
+  
+  
+  --color-error: var(--error);
+  --color-on-error: var(--on-error);
+  --color-error-container: var(--error-container);
+  --color-on-error-container:var(--on-error-container);
+  
+  
+  --color-background: var(--background);
+  --color-on-background: var(--on-background);
+  
+  --color-surface: var(--surface);
+  --color-on-surface: var(--on-surface);
+  --color-surface-variant: var(--surface-variant);
+  --color-on-surface-variant: var(--on-surface-variant);
+  
+  --color-outline: var(--outline);
+  --color-outline-variant: var(--outline-variant);
+  
+  --color-shadow: var(--shadow);
+  --color-scrim: var(--scrim);
+    
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-inverse-primary: var(--inverse-primary);
+    
+  /* Variantes de superficie para diferentes niveles de elevación: Se usan para jerarquizar la UI. */
+  --color-surface-dim: var(--surface-dim);
+  --color-surface-bright: var(--surface-bright);
+  --color-surface-container-lowest: var(--surface-container-lowest);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  --color-surface-container-highest: var(--surface-container-highest);
+
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-}
 
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 20 14.3% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 20 14.3% 4.1%;
-    --primary: 47.9 95.8% 53.1%;
-    --primary-foreground: 26 83.3% 14.1%;
-    --secondary: 60 4.8% 95.9%;
-    --secondary-foreground: 24 9.8% 10%;
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    --accent: 60 4.8% 95.9%;
-    --accent-foreground: 24 9.8% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
-    --input: 20 5.9% 90%;
-    --ring: 20 14.3% 4.1%;
-    --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-  }
-
-  .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
-    --card: 20 14.3% 4.1%;
-    --card-foreground: 60 9.1% 97.8%;
-    --popover: 20 14.3% 4.1%;
-    --popover-foreground: 60 9.1% 97.8%;
-    --primary: 47.9 95.8% 53.1%;
-    --primary-foreground: 26 83.3% 14.1%;
-    --secondary: 12 6.5% 15.1%;
-    --secondary-foreground: 60 9.1% 97.8%;
-    --muted: 12 6.5% 15.1%;
-    --muted-foreground: 24 5.4% 63.9%;
-    --accent: 12 6.5% 15.1%;
-    --accent-foreground: 60 9.1% 97.8%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
-    --input: 12 6.5% 15.1%;
-    --ring: 35.5 91.7% 32.9%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-  }
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+  --font-text: var(--font-text);
+  --font-title: var(--font-title);
 }
 

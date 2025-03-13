@@ -46,7 +46,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
             <PaginationItem>
               <PaginationPrevious
                 onClick={() => onPageChange(currentPage - 1)}
-                className="cursor-pointer"
+                className="cursor-pointer text-secondary"
               />
             </PaginationItem>
           )}
@@ -56,7 +56,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
               <PaginationLink
                 onClick={() => onPageChange(page)}
                 isActive={page === currentPage}
-                className="cursor-pointer"
+                className={`cursor-pointer  ${page === currentPage? 'bg-secondary text-on-secondary':'text-secondary hover:bg-secondary hover:text-on-secondary'}`}
               >
                 {page}
               </PaginationLink>
@@ -67,7 +67,7 @@ const PaginationTable: React.FC<PaginationTableProps> = ({
             <PaginationItem>
               <PaginationNext
                 onClick={() => onPageChange(currentPage + 1)}
-                className="cursor-pointer"
+                className="cursor-pointer text-secondary"
               />
             </PaginationItem>
           )}

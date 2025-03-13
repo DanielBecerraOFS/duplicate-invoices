@@ -9,7 +9,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import "./../../../../Celonis_DummyData.json";
 import { Checkbox } from "@/components/ui/checkbox";
 
 import {
@@ -87,7 +86,7 @@ const TableLog: React.FC<TableLogProps> = ({ invoices }) => {
     <div className="table-container flex flex-col gap-4">
       <Table>
         <TableCaption>
-          {Object.keys(grouped_invoices).length > 1
+          {Object.keys(grouped_invoices).length < 1
             ? "No data available to display"
             : `${Object.keys(grouped_invoices).length} available data found`}
         </TableCaption>

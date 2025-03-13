@@ -45,6 +45,31 @@ interface InvoiceResponse {
   count: number;
 }
 
+interface GroupedInvoices {
+  [key: string]: {
+    items: Invoice[];
+    region: string;
+    pattern: string;
+    open: string;
+    date: string;
+    confidence: string;
+    amount_overpaid: string,
+  };
+}
+
+interface FlattenedInvoiceGroup {
+  groupId: string;
+  region: string;
+  pattern: string;
+  open: string;
+  date: string;
+  confidence: string;
+  amount_overpaid: number;
+  items: Invoice[];
+  // You can add additional fields like itemCount, etc.
+  itemCount: number;
+}
+
 interface KPI {
   [key: string]: number | string;
 }
@@ -80,7 +105,7 @@ export const getInvoices = async (
 ): Promise<InvoiceResponse> => {
   try {
     const response: AxiosResponse<InvoiceResponse> = await apiClient.get(
-      "/api/invoices/",
+      "/api/invoices/?pagination=false",
       { params: filters }
     );
     return response.data;
@@ -144,4 +169,6 @@ export type {
   InvoicesMetadata,
   Agent,
   AgentAlerts,
+  FlattenedInvoiceGroup,
+  GroupedInvoices
 };

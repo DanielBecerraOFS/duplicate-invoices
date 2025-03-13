@@ -74,13 +74,11 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-
-  // Efecto para manejar el mensaje inicial cuando el componente se monta
   useEffect(() => {
     if (initialMessage && initialMessage.trim() !== "") {
       handleSendMessage(initialMessage);
     }
-  }, []); // Se ejecuta solo una vez al montar el componente
+  }, []); 
 
   const handleSendMessage = (messageToSend = inputMessage) => {
     if (messageToSend.trim() === "") return;
