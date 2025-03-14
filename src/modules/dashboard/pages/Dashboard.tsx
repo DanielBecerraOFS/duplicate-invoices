@@ -26,10 +26,15 @@ import {
   getInvoicesMetadata,
   getAgentAlerts,
   AgentAlerts,
+  FlattenedInvoiceGroup,
+  getGroupedInvoices,
+  InvoiceResponse,
+  FlattenedResponse,
 } from "@/modules/dashboard/services/apiService";
 
 import { groupedInvoiceSchema } from "@/modules/dashboard/utils/data/label-schema-table"
 import tasksData from '@/modules/dashboard/utils/data/sample-task-data.json';
+import { AlertsDialog } from "@/modules/sofia/router";
 
 // Improved type definitions
 type FilterKeys = "reference" | "pattern" | "confidence" | "vendor" | "date";
@@ -54,6 +59,8 @@ function groupedByUUID(invoices: Invoice[]): GroupedInvoices {
           date: "",
           confidence: "",
           amount_overpaid: "",
+          itemsCount: 0,
+          group_id:"",
         };
       }
       result[groupKey].items.push(invoice);
@@ -62,6 +69,9 @@ function groupedByUUID(invoices: Invoice[]): GroupedInvoices {
       result[groupKey].open = invoice.open === true ? "Open" : "Close";
       result[groupKey].date = FormatInvoiceDate(invoice.date);
       result[groupKey].pattern = invoice.pattern;
+      result[groupKey].itemsCount = result[groupKey].items.length;
+      result[groupKey].pattern = invoice.pattern;
+      result[groupKey].group_id = invoice.pattern;
     });
     Object.keys(result).forEach((groupKey) => {
       const group = result[groupKey];
@@ -77,7 +87,7 @@ function groupedByUUID(invoices: Invoice[]): GroupedInvoices {
 
 const Dashboard: React.FC = () => {
   // Consolidated state with more specific types
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [groupInvoices, setGroupInvoices] = useState<FlattenedInvoiceGroup[]>([]);
   const [kpiData, setKpiData] = useState<KPI | null>(null);
   const [metadata, setInvoicesMetadata] = useState<InvoicesMetadata | null>(null);
   const [alerts, setAgentAlerts] = useState<AgentAlerts | null>(null);
@@ -112,45 +122,6 @@ const Dashboard: React.FC = () => {
   // Debounce filter changes to prevent excessive API calls
   const debouncedFilters = useDebounce(activeFilters, 300);
 
-  // Memoized unique filter options using only what's needed
-  const confidenceOptions = useMemo(() => ["High", "Medium", "Low"], []);
-
-  // Optimized select change handler
-  const handleSelectChange = useCallback((fieldName: FilterKeys, value: string) => {
-    setFilterValues(prev => ({ ...prev, [fieldName]: value }));
-  }, []);
-
-  // Apply filters more efficiently
-  const applyFilters = useCallback(() => {
-    const newFilters = Object.entries(filterValues).reduce(
-      (acc, [key, value]) => {
-        if (value) {
-          acc[key] = value;
-        }
-        return acc;
-      },
-      {} as Record<string, string>
-    );
-
-    setActiveFilters(newFilters);
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-  }, [filterValues]);
-
-  // Clear filters more efficiently
-  const clearFilters = useCallback(() => {
-    const emptyFilters: FilterState = {
-      reference: "",
-      pattern: "",
-      confidence: "",
-      vendor: "",
-      date: "",
-    };
-    
-    setFilterValues(emptyFilters);
-    setActiveFilters({});
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-  }, []);
-
   // Fetch all initial data in one useEffect
   useEffect(() => {
     const initialLoad = async () => {
@@ -158,19 +129,19 @@ const Dashboard: React.FC = () => {
       
       try {
         // Parallel data fetching for initial load
-        const [kpiResponse, alertsResponse, invoiceResponse, metadataResponse] = await Promise.all([
+        const [kpiResponse, alertsResponse, groupInvoices, metadataResponse] = await Promise.all([
           getKPIs(),
           getAgentAlerts(),
-          getInvoices({ page: 1 }),
+          getGroupedInvoices(),
           getInvoicesMetadata()
         ]);
 
         setKpiData(kpiResponse);
-        setAgentAlerts(alertsResponse);        
-        setInvoices(invoiceResponse.results);
+        setAgentAlerts(alertsResponse);               
+        setGroupInvoices(groupInvoices.results);
         setPagination(prev => ({
           ...prev,
-          totalPages: Math.ceil(invoiceResponse.count / pagination.itemsPerPage) || 1
+          totalPages: Math.ceil(groupInvoices.count / pagination.itemsPerPage) || 1
         }));
         setInvoicesMetadata(metadataResponse);
       } catch (error) {
@@ -246,8 +217,8 @@ const Dashboard: React.FC = () => {
           page: pagination.currentPage,
         };
 
-        const response = await getInvoices(params);
-        setInvoices(response.results);
+        const response = await getGroupedInvoices();        
+        setGroupInvoices(response.results);
        
         setPagination(prev => ({
           ...prev,
@@ -274,20 +245,17 @@ const Dashboard: React.FC = () => {
     }));
     
     try {
-      const [alertsResponse, invoiceResponse, metadataResponse] = await Promise.all([
+      const [alertsResponse, groupInvoices, metadataResponse] = await Promise.all([
         getAgentAlerts(),
-        getInvoices({ 
-          ...debouncedFilters,
-          page: pagination.currentPage 
-        }),
+        getGroupedInvoices(),
         getInvoicesMetadata()
       ]);
 
       setAgentAlerts(alertsResponse);
-      setInvoices(invoiceResponse.results);
+      setGroupInvoices(groupInvoices.results);
       setPagination(prev => ({
         ...prev,
-        totalPages: Math.ceil(invoiceResponse.count / pagination.itemsPerPage) || 1
+        totalPages: Math.ceil(groupInvoices.count / pagination.itemsPerPage) || 1
       }));
       setInvoicesMetadata(metadataResponse);
     } catch (error) {
@@ -302,9 +270,10 @@ const Dashboard: React.FC = () => {
     }
   }, [debouncedFilters, pagination.currentPage, pagination.itemsPerPage, loading.initial, handleApiError]);
 
-  const handlePageChange = useCallback((page: number) => {
-    setPagination(prev => ({ ...prev, currentPage: page }));
-  }, []);
+  const handleDialogAction = () => {
+    console.log('Dialog action triggered');
+    // Add your action logic here
+  };
 
   if (loading.initial) {
     return (
@@ -323,7 +292,9 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="grid-content">
+    <div className="grid-content realtive">
+      {alerts && <AlertsDialog description={alerts.Alert.message}/>}
+      
       <div className="kpi-grid-content">
         <div className="flex flex-row justify-between gap-2 flex-wrap">
           {kpiData &&
@@ -361,7 +332,7 @@ const Dashboard: React.FC = () => {
           </div>
         )}
       </div>
-    <DataTable data={[]} groupedData={groupedByUUID(invoices)}  columns={TableColumns}/> 
+      <DataTable data={[]} groupedData={groupInvoices}  columns={TableColumns}/> 
     </div>
   );
 };

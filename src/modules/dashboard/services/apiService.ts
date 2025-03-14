@@ -54,11 +54,13 @@ interface GroupedInvoices {
     date: string;
     confidence: string;
     amount_overpaid: string,
+    itemsCount:number,
+    group_id: string;
   };
 }
 
 interface FlattenedInvoiceGroup {
-  groupId: string;
+  group_id: string;
   region: string;
   pattern: string;
   open: string;
@@ -66,8 +68,13 @@ interface FlattenedInvoiceGroup {
   confidence: string;
   amount_overpaid: number;
   items: Invoice[];
-  // You can add additional fields like itemCount, etc.
-  itemCount: number;
+  itemsCount: number;
+}
+
+
+interface FlattenedResponse {
+  results: FlattenedInvoiceGroup[];
+  count: number;
 }
 
 interface KPI {
@@ -108,6 +115,18 @@ export const getInvoices = async (
       "/api/invoices/?pagination=false",
       { params: filters }
     );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    throw error;
+  }
+};
+
+export const getGroupedInvoices = async (): Promise<FlattenedResponse> => {
+  try {
+    const response: AxiosResponse<FlattenedResponse> = await apiClient.get(
+      "/api/groups",
+    );    
     return response.data;
   } catch (error) {
     console.error("Error fetching invoices:", error);
@@ -170,5 +189,6 @@ export type {
   Agent,
   AgentAlerts,
   FlattenedInvoiceGroup,
-  GroupedInvoices
+  GroupedInvoices,
+  FlattenedResponse
 };

@@ -1,5 +1,4 @@
 "use client";
-import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import {
@@ -16,56 +15,22 @@ import {
   TableDrawerDetails,
 } from "@/modules/dashboard/router";
 import {
-  CircleLoader
-} from "@/modules/core/router";
-import {
-  getInvoices,
-  InvoiceResponse,
+  Invoice,
 } from "@/modules/dashboard/services/apiService";
 
 interface InvoiceDrawerProps {
   buttonTitle: string;
-  group_uuid: string;
+  group: Invoice[];
   type: string;
 }
 
 const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
   buttonTitle,
-  group_uuid,
+  group,
   type = "link",
 }) => {
-  const [invoices, setGroupInvoices] = useState<InvoiceResponse>();
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const fetchInvoices = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      const filters = {
-        group_id: group_uuid,
-      };
-      const response = await getInvoices(filters);
-      setGroupInvoices(response);
-    } catch (error) {
-      console.error("Error al cargar facturas:", error);
-      // Optionally add error handling (e.g., toast notification)
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Render loader for card details
   const renderCardDetails = () => {
-    if (loading) {
-      return (
-        <div className="dashboard-layout w-[100svw] h-[100svh] py-1 px-4 md:px-8 md:py-4 flex justify-center items-center">
-          <div className="app-wrapper flex flex-col justify-center items-center gap-4 w-full h-full">
-            <CircleLoader width={150} height={150} />
-          </div>
-        </div>
-      );
-    }
-
-    if (!invoices || invoices.results.length === 0) {
+    if (!group || group.length === 0) {
       return (
         <div className="text-gray-500 text-center py-4">
           No invoice details available
@@ -77,48 +42,33 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       <div className="invoice-details-container flex flex-row justify-start gap-2">
         <CardInvoiceDetails
           title="Confidence"
-          value={invoices.results[0].confidence}
-          status={
-            invoices.results[0].confidence === "High" ? "danger" : "default"
-          }
+          value={group[0].confidence}
+          status={group[0].confidence === "High" ? "danger" : "default"}
           icon="high"
         />
         <CardInvoiceDetails
           title="Accurancy"
-          value={invoices.results[0].accuracy.toString()}
+          value={group[0].accuracy.toString()}
           isCurrency={false}
         />
         <CardInvoiceDetails
           title="Amount at Risk"
-          value={invoices.results
+          value={group
             .slice(1)
             .reduce((total, invoice) => total + (Number(invoice.value) || 0), 0)
             .toString()}
           isCurrency={true}
         />
-        <CardInvoiceDetails
-          title="Group Pattern"
-          value={invoices.results[0].pattern}
-        />
+        <CardInvoiceDetails title="Group Pattern" value={group[0].pattern} />
         <CardInvoiceDetails
           title="Status"
-          value={invoices.results[0].open === true ? "Open" : "Close"}
+          value={group[0].open === true ? "Open" : "Close"}
         />
       </div>
     );
   };
   const renderTableContent = () => {
-    if (loading) {
-      return (
-        <div className="w-full flex justify-center items-center py-4">
-          <CircleLoader width={60} height={60} />
-        </div>
-      );
-    }
-
-    return invoices ? (
-      <TableDrawerDetails invoices_group={invoices.results} />
-    ) : null;
+    return group ? <TableDrawerDetails invoices_group={group} /> : null;
   };
 
   return (
@@ -128,7 +78,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
           <Button
             variant="ghost"
             className="text-blue-400 cursor-pointer p-0 hover:underline decoration-solid"
-            onClick={fetchInvoices}
+            /* onClick={fetchInvoices} */
           >
             {buttonTitle}
           </Button>
@@ -136,7 +86,7 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
           <Button
             variant="default"
             className="mt-4 cursor-pointer"
-            onClick={fetchInvoices}
+            /* onClick={fetchInvoices} */
           >
             {buttonTitle}
           </Button>

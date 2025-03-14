@@ -3,24 +3,23 @@ import { ColumnDef } from "@tanstack/react-table";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-  labels,
   confidence,
   status_inv,
 } from "@/modules/dashboard/utils/data/label-data-table";
 import {
-  TableLabel,
   DataTableColumnHeader,
   DataTableRowActions,
-  TableGroupedLabel
+  FormatInvoiceDate,
+  FormatValues,
+  InvoiceDrawerDetails,
+  TableGroupedLabel,
 } from "@/modules/dashboard/router";
+import { FlattenedInvoiceGroup } from "../../services/apiService";
 
 const getBadgeVariant = (
   confidence: string
 ): "default" | "high" | "medium" | "low" => {
-  // Convertir a minúsculas para comparación consistente
   const confidenceLevel = confidence.toLowerCase();
-
-  // Retornar la variante adecuada según el nivel de confianza
   if (confidenceLevel === "high") {
     return "high";
   } else if (confidenceLevel === "medium") {
@@ -28,11 +27,11 @@ const getBadgeVariant = (
   } else if (confidenceLevel === "low") {
     return "low";
   } else {
-    return "default"; // Variante por defecto para otros casos
+    return "default"; 
   }
 };
 
-export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
+export const TableColumns: ColumnDef<FlattenedInvoiceGroup>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -63,7 +62,16 @@ export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
       <DataTableColumnHeader column={column} title="Pattern" />
     ),
     cell: ({ row }) => (
-      <div className="w-[80px]">{row.getValue("pattern")}</div>
+      console.log("row", row.original.items),
+      (
+        <div className="w-[150px] cursor-pointer">
+          <InvoiceDrawerDetails
+            buttonTitle={row.getValue("pattern")}
+            group={row.original.items}
+            type="link"
+          />
+        </div>
+      )
     ),
     enableSorting: false,
     enableHiding: false,
@@ -89,7 +97,7 @@ export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="font-medium">{row.getValue("date")}</span>
+          <span className="font-medium">{FormatInvoiceDate(row.getValue("date"))}</span>
         </div>
       );
     },
@@ -110,7 +118,7 @@ export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
 
       return (
         <div className="flex items-center">
-          <Badge variant={getBadgeVariant(confidence_item.value)} >
+          <Badge variant={getBadgeVariant(confidence_item.value)}>
             {confidence_item.icon && (
               <confidence_item.icon className=" h-4 w-4 text-muted-foreground" />
             )}
@@ -128,9 +136,10 @@ export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Status" />
     ),
-    cell: ({ row }) => {      
+    cell: ({ row }) => {
+      const row_original = row.original.open ? "Open" : "Close"
       const status_type = status_inv.find(
-        (item) => item.label === String(row.original.open)
+        (item) => item.label === row_original
       );
 
       if (!status_type) {
@@ -158,7 +167,7 @@ export const TableColumns: ColumnDef<TableGroupedLabel>[] = [
     cell: ({ row }) => {
       return (
         <div className="flex items-center font-medium">
-          <span> $ {row.original.amount_overpaid}</span>
+          <span> $ {FormatValues(row.original.amount_overpaid)}</span>
         </div>
       );
     },

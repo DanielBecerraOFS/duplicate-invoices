@@ -46,9 +46,9 @@ export default function DataTableToolbar<TData>({
             options={region}
           />
         )}
-        {table.getColumn("priority") && (
+        {table.getColumn("date") && (
           <DataTableFacetedFilter
-            column={table.getColumn("priority")}
+            column={table.getColumn("date")}
             title="Date"
             options={confidence}
           />

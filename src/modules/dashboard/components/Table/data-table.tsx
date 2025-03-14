@@ -30,7 +30,7 @@ import { FlattenedInvoiceGroup,  GroupedInvoices} from "@/modules/dashboard/serv
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[],
-  groupedData?: GroupedInvoices;
+  groupedData?: FlattenedInvoiceGroup[];
 }
 
 export default function DataTable<TData, TValue>({
