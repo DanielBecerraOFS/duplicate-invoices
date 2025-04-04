@@ -8,8 +8,6 @@ export { default as InvoiceDrawerDetails } from '@/modules/dashboard/components/
 export { default as CardInvoiceDetails } from '@/modules/dashboard/components/CardInvoiceDetails';
 export { default as TableDrawerDetails } from '@/modules/dashboard/components/TableDrawerDetails';
 export { default as SelectTableFilter } from '@/modules/dashboard/components/SelectTableFilter';
-export { default as AssistentSheet } from "@/modules/dashboard/components/AssistentSheet"
-export { default as FloatingButton } from "@/modules/dashboard/components/FloatingButton"
 export { default as RecommendsCarrousel } from "@/modules/dashboard/components/RecommendsCarrousel"
 // Table
 export { default as DataTablePagination } from "@/modules/dashboard/components/Table/data-table-pagination"

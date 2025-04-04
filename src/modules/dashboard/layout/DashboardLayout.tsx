@@ -1,6 +1,7 @@
 
 import { Toaster } from "@/components/ui/sonner";
-import { AppBar, Dashboard, FloatingButton } from "@/modules/dashboard/router";
+import { AppBar, Dashboard } from "@/modules/dashboard/router";
+import { FloatingButton } from "@/modules/sofia/router";
 import { TooltipProvider } from "@radix-ui/react-tooltip";
 
 const DashboardLayout: React.FC = () => {

@@ -20,7 +20,7 @@ import {
 
 interface InvoiceDrawerProps {
   buttonTitle: string;
-  group: Invoice[];
+  group: Invoice[] | any;
   type: string;
 }
 
@@ -42,27 +42,27 @@ const InvoiceDrawerDetails: React.FC<InvoiceDrawerProps> = ({
       <div className="invoice-details-container flex flex-row justify-start gap-2">
         <CardInvoiceDetails
           title="Confidence"
-          value={group[0].confidence}
-          status={group[0].confidence === "High" ? "danger" : "default"}
+          value={group[0].confidence as string}
+          status={(group[0].confidence === "High" ? "danger" : "default") as "danger" | "default"}
           icon="high"
         />
         <CardInvoiceDetails
           title="Accurancy"
-          value={group[0].accuracy.toString()}
+          value={group[0].accuracy.toString() as string}
           isCurrency={false}
         />
         <CardInvoiceDetails
           title="Amount at Risk"
           value={group
-            .slice(1)
-            .reduce((total, invoice) => total + (Number(invoice.value) || 0), 0)
-            .toString()}
+        .slice(1)
+        .reduce((total: number, invoice: Invoice) => total + (Number(invoice.value) || 0), 0)
+        .toString() as string}
           isCurrency={true}
         />
-        <CardInvoiceDetails title="Group Pattern" value={group[0].pattern} />
+        <CardInvoiceDetails title="Group Pattern" value={group[0].pattern as string} />
         <CardInvoiceDetails
           title="Status"
-          value={group[0].open === true ? "Open" : "Close"}
+          value={(group[0].open === true ? "Open" : "Close") as "Open" | "Close"}
         />
       </div>
     );

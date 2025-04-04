@@ -98,7 +98,7 @@ interface AgentAlerts {
   };
 }
 
-const API_URL = "https://invoice-ofiservices.pythonanywhere.com/";
+const API_URL = "http://52.201.138.164:5001/";
 
 const apiClient = axios.create({
   baseURL: API_URL,

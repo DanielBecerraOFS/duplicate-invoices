@@ -7,9 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import SofiaAlerts from "@/assets/sofia-alerts.png";
 
@@ -25,7 +23,6 @@ const AlertsDialog: React.FC<AlertDialogProps> = ({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // Open the dialog when the component mounts
     setOpen(true);
   }, []);
 
@@ -50,8 +47,8 @@ const AlertsDialog: React.FC<AlertDialogProps> = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-4">
-            <AlertDialogCancel>Close</AlertDialogCancel>
-            <AlertDialogAction className="bg-scrim text-inverse-on-surface">
+            <AlertDialogCancel className="cursor-pointer">Close</AlertDialogCancel>
+            <AlertDialogAction className="bg-scrim text-inverse-on-surface border hover:bg-surface hover:text-on-surface cursor-pointer">
               ✨ Review with SOFIA ✨
             </AlertDialogAction>
           </AlertDialogFooter>

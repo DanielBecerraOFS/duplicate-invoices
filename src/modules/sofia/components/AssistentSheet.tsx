@@ -7,7 +7,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { CloudUpload, SendHorizontal } from "lucide-react";
+import { CloudUpload, SendHorizontal, Sparkles } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -15,8 +15,8 @@ import { Input } from "@/components/ui/input";
 import ChatBotBody from "@/assets/ofia-chatbot.png";
 import HeadChatbotOFIA from "@/assets/ofia-chatbot-head.png";
 import { TolltipInfoHover } from "@/modules/core/router";
-import { getAgentResponse } from "../services/apiService";
-import InvoiceDrawerDetails from "./InvoiceDrawerDetails";
+import { getAgentResponse } from "@/modules/sofia/services/api-service";
+import InvoiceDrawerDetails from "../../dashboard/components/InvoiceDrawerDetails";
 
 interface Message {
   id: number;
@@ -78,7 +78,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
     if (initialMessage && initialMessage.trim() !== "") {
       handleSendMessage(initialMessage);
     }
-  }, []); 
+  }, []);
 
   const handleSendMessage = (messageToSend = inputMessage) => {
     if (messageToSend.trim() === "") return;
@@ -209,26 +209,18 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
         >
           <SheetTrigger asChild>
             <Button variant="ghost" className="cursor-pointer">
-              <picture className="floating-button-img-concept">
-                <source src={HeadChatbotOFIA} />
-                <img
-                  src={HeadChatbotOFIA}
-                  alt="ofia-chatbot-concept"
-                  width={30}
-                  height={30}
-                />
-              </picture>
+              <Sparkles strokeWidth={1.25} />
             </Button>
           </SheetTrigger>
         </TolltipInfoHover>
       ) : type == "floating-button" ? (
-        <TolltipInfoHover title="✨ Ask to OFIA ✨" content="" action={null}>
+        <TolltipInfoHover title="✨ Ask to SOFIA ✨" content="" action={null}>
           <SheetTrigger asChild>
             <Button
               size="icon"
-              className="floating-sofia-button rounded-full h-12 w-12 shadow-lg p-1 bg-primary cursor-pointer"
+              className="floating-sofia-button rounded-full h-12 w-12 shadow-lg p-1 bg-secondary cursor-pointer hover:bg-on-secondary-container"
             >
-              <div className="ring-spacer h-full w-full rounded-full bg-zinc-50 flex justify-center items-center">
+              <div className="ring-spacer h-full w-full rounded-full bg-on-secondary flex justify-center items-center">
                 <picture className="floating-button-img-concept">
                   <source src={HeadChatbotOFIA} />
                   <img
@@ -250,7 +242,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
         </SheetTrigger>
       )}
 
-      <SheetContent className="max-h-[95dvh] m-auto rounded-l-md border-l-2 border-t-2 border-b-2 border-amber-400">
+      <SheetContent className="max-h-[95dvh] m-auto rounded-l-md border-l-2 border-t-2 border-b-2 border-primary text-on-surface">
         <SheetHeader>
           <SheetTitle className="text-center">✨ SOFIA AGENT ✨</SheetTitle>
         </SheetHeader>
@@ -273,7 +265,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                 </p>
 
                 <div className="started-topics-grid grid grid-cols-2 gap-2">
-                  <Card>
+                  <Card className="py-4">
                     <CardHeader>
                       <CardTitle>Recomendations</CardTitle>
                     </CardHeader>
@@ -284,7 +276,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                       </p>
                     </CardContent>
                   </Card>
-                  <Card>
+                  <Card className="py-4">
                     <CardHeader>
                       <CardTitle>Analysis</CardTitle>
                     </CardHeader>
@@ -342,7 +334,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
                             {message.text.action && (
                               <InvoiceDrawerDetails
                                 buttonTitle="Review Goup Invoice"
-                                group_uuid={message.text.params}
+                                group={message.text.params}
                                 type="button"
                               />
                             )}
@@ -358,7 +350,7 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
           </ScrollArea>
           <div className="sheet-input-container">
             <div className="flex w-full max-w-sm items-center space-x-2">
-              <Button variant="outline" type="submit">
+              <Button variant="outline" className="bg-on-secondary text-on-secondary-container w-12">
                 <CloudUpload />
               </Button>
               <Input
@@ -370,7 +362,8 @@ const AssistentSheet: React.FC<AssistentSheetProps> = ({
               />
               <Button
                 onClick={() => handleSendMessage()}
-                className="cursor-pointer"
+                className="cursor-pointer text-on-secondary border-secondary w-12"
+                variant="secondary"
               >
                 <SendHorizontal />
               </Button>

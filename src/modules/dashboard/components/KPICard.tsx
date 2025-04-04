@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { AssistentSheet, FormatValues } from "@/modules/dashboard/router";
-
+import { FormatValues } from "@/modules/dashboard/router";
+import { AssistentSheet } from "@/modules/sofia/router";
 interface KPICardProps {
   title:string;
   legend:string;
