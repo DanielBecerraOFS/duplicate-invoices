@@ -1,4 +1,4 @@
-import AssistentSheet from "@/modules/dashboard/components/AssistentSheet";
+import {AssistentSheet} from "@/modules/sofia/router";
 
 const FloatingActionButton = ({}) => {
   return (

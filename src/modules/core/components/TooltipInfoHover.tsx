@@ -10,6 +10,7 @@ interface TooltipInfoHoverProps {
   title: string;
   content: string;
   children: React.ReactNode;
+  className?: string;
 }
 
 const TooltipInfoHover: React.FC<TooltipInfoHoverProps> = ({
@@ -17,10 +18,11 @@ const TooltipInfoHover: React.FC<TooltipInfoHoverProps> = ({
   action,
   title,
   content,
+  className
 }) => {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>{children}</TooltipTrigger>
+      <TooltipTrigger className={className} asChild>{children}</TooltipTrigger>
       <TooltipContent className="text-center">
         <h4 className="font-bold">{title}</h4>
         <p>{content}</p>

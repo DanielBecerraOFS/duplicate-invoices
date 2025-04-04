@@ -27,7 +27,7 @@ const SelectTableFilter: React.FC<SelectTableFilterProps> = ({
   return (
     <div className="space-y-2">
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="w-[200px] border-amber-300 ">
+        <SelectTrigger className="w-[200px] border-primary ">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>

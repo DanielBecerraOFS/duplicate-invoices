@@ -8,7 +8,7 @@ import Autoplay from "embla-carousel-autoplay";
 import React from "react";
 import HeadChatbotOFIA from "@/assets/ofia-chatbot-head.png";
 import { AgentAlerts } from "@/modules/dashboard/services/apiService";
-import {AssistentSheet} from "@/modules/dashboard/router";
+import {AssistentSheet} from "@/modules/sofia/router";
 interface RecommendsCarrouselProps{
   alerts: AgentAlerts
 }

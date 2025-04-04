@@ -45,6 +45,38 @@ interface InvoiceResponse {
   count: number;
 }
 
+interface GroupedInvoices {
+  [key: string]: {
+    items: Invoice[];
+    region: string;
+    pattern: string;
+    open: string;
+    date: string;
+    confidence: string;
+    amount_overpaid: string,
+    itemsCount:number,
+    group_id: string;
+  };
+}
+
+interface FlattenedInvoiceGroup {
+  group_id: string;
+  region: string;
+  pattern: string;
+  open: string;
+  date: string;
+  confidence: string;
+  amount_overpaid: number;
+  items: Invoice[];
+  itemsCount: number;
+}
+
+
+interface FlattenedResponse {
+  results: FlattenedInvoiceGroup[];
+  count: number;
+}
+
 interface KPI {
   [key: string]: number | string;
 }
@@ -66,7 +98,7 @@ interface AgentAlerts {
   };
 }
 
-const API_URL = "https://invoice-ofiservices.pythonanywhere.com/";
+const API_URL = "http://52.201.138.164:5001/";
 
 const apiClient = axios.create({
   baseURL: API_URL,
@@ -80,9 +112,21 @@ export const getInvoices = async (
 ): Promise<InvoiceResponse> => {
   try {
     const response: AxiosResponse<InvoiceResponse> = await apiClient.get(
-      "/api/invoices/",
+      "/api/invoices/?pagination=false",
       { params: filters }
     );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching invoices:", error);
+    throw error;
+  }
+};
+
+export const getGroupedInvoices = async (): Promise<FlattenedResponse> => {
+  try {
+    const response: AxiosResponse<FlattenedResponse> = await apiClient.get(
+      "/api/groups",
+    );    
     return response.data;
   } catch (error) {
     console.error("Error fetching invoices:", error);
@@ -144,4 +188,7 @@ export type {
   InvoicesMetadata,
   Agent,
   AgentAlerts,
+  FlattenedInvoiceGroup,
+  GroupedInvoices,
+  FlattenedResponse
 };

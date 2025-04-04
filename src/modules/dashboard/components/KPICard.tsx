@@ -1,6 +1,6 @@
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { AssistentSheet, FormatValues } from "@/modules/dashboard/router";
-
+import { FormatValues } from "@/modules/dashboard/router";
+import { AssistentSheet } from "@/modules/sofia/router";
 interface KPICardProps {
   title:string;
   legend:string;
@@ -16,13 +16,13 @@ const KPICard: React.FC<KPICardProps> = ({
   data = 0,
 }) => {
   return (
-    <Card className="flex-1 border-amber-300 border-1">
+    <Card className="flex-1 border-primary justify-center border-1 py-3">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
         <AssistentSheet type="tooltip" initialMessage="" params={{}} />
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold">
+        <div className="text-5xl font-bold">
           {isCurrency? `$ ${FormatValues(data)}`: FormatValues(data)}
         </div>
         <p className="text-xs text-muted-foreground">{legend}</p>
